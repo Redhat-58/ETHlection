@@ -1,12 +1,3 @@
-interface Props {
-  suName: string;
-  candidateName: string;
-  yos: number;
-  college: string;
-  major: string;
-  description: string;
-}
-
 function CandidateCard({
   suName,
   candidateName,
@@ -14,7 +5,7 @@ function CandidateCard({
   college,
   major,
   description,
-}: Props) {
+}) {
   return (
     <div className="card" style={{ width: "18rem" }}>
       <div className="card-body">
