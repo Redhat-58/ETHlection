@@ -7,7 +7,19 @@ function CandidateCard({
   description,
 }) {
   return (
-    <div className="card" style={{ width: "18rem" }}>
+    <div
+      className="card"
+      style={{
+        backgroundColor: "#FFFFFF",
+        borderRadius: "5px",
+        padding: "20px",
+        margin: "10px",
+        height: "300px",
+        width: "400px",
+        textAlign: "center",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Adds a subtle shadow
+      }}
+    >
       <div className="card-body">
         <h5 className="card-title">{candidateName}</h5>
         <h6 className="card-subtitle mb-2 text-body-secondary">{suName}</h6>

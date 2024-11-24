@@ -1,13 +1,10 @@
-import { useContext, useState } from "react";
-import { Web3Context } from "../App";
+import { useState } from "react";
 import OptionCard from "./OptionCard";
 import Lightbox from "./Lightbox";
-import Web3 from "web3";
 
 function CUSIS() {
-  const { setWeb3, setAccount } = useContext(Web3Context);
   const [selectedOption, setSelectedOption] = useState("");
-  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const options = [
     {
       id: 1,
@@ -26,8 +23,8 @@ function CUSIS() {
     },
     {
       id: 4,
-      title: "End an Election",
-      handler: () => handleOptionClick("End an Election"),
+      title: "Whitelist Voters",
+      handler: () => handleOptionClick("Whitelist Voters"),
     },
     {
       id: 5,
@@ -41,45 +38,37 @@ function CUSIS() {
     },
     {
       id: 7,
-      title: "Edit Time",
-      handler: () => handleOptionClick("Edit Time"),
+      title: "Edit Start Time",
+      handler: () => handleOptionClick("Edit Start Time"),
     },
     {
       id: 8,
+      title: "Edit End Time",
+      handler: () => handleOptionClick("Edit End Time"),
+    },
+    {
+      id: 9,
       title: "View Time",
       handler: () => handleOptionClick("View Time"),
     },
     {
-      id: 9,
+      id: 10,
       title: "Agree Time",
       handler: () => handleOptionClick("Agree Time"),
     },
-    { id: 10, title: "Connect Wallet", handler: connectWallet },
+    {
+      id: 11,
+      title: "View Winner",
+      handler: () => handleOptionClick("View Winner"),
+    },
   ];
 
   // Handle click with different functions for each option
-  function handleOptionClick(option) {
+  const handleOptionClick = (option) => {
     console.log("Option clicked:", option);
     setSelectedOption(option);
-    setIsLightboxOpen(true);
-  }
-
-  async function connectWallet() {
-    if (window.ethereum) {
-      try {
-        const web3 = new Web3(window.ethereum);
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        setWeb3(web3);
-
-        const accounts = await web3.eth.getAccounts();
-        setAccount(accounts[0]);
-      } catch (error) {
-        console.error("User denied account access or error occurred:", error);
-      }
-    } else {
-      console.error("No Wallet Found!");
-    }
-  }
+    setLightboxOpen(true);
+  };
 
   return (
     <>
@@ -101,8 +90,8 @@ function CUSIS() {
         ))}
       </div>
       <Lightbox
-        isOpen={isLightboxOpen}
-        onClose={() => setIsLightboxOpen(false)}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
         selectedOption={selectedOption}
       />
     </>

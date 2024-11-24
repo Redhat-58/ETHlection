@@ -3,20 +3,17 @@ import { NavLink } from "react-router-dom";
 import { Web3Context } from "../App";
 
 function Navbar() {
-  const { web3 } = useContext(Web3Context);
+  const { web3, contractAddr } = useContext(Web3Context);
   const [balance, setBalance] = useState("0.0000");
-  const contractAddr = "0xf9E2e95C2c98c663f4709243ca12eD56C11C6F16";
 
   // Fetch balance
   useEffect(() => {
     const fetchBalance = async () => {
-      if (web3) {
+      if (web3 && contractAddr) {
         try {
-          const balance = web3.utils.fromWei(
-            web3.eth.getBalance(contractAddr),
-            "ether"
-          );
-          setBalance(Number(balance).toPrecision(4));
+          const balanceWei = await web3.eth.getBalance(contractAddr);
+          const balanceEth = web3.utils.fromWei(balanceWei, "ether");
+          setBalance(Number(balanceEth).toPrecision(4));
         } catch (error) {
           console.error("Error fetching balance:", error);
         }
@@ -25,10 +22,10 @@ function Navbar() {
 
     fetchBalance();
 
-    // Refresh balance every second
+    // Refresh balance every 10 second
     const interval = setInterval(() => {
       fetchBalance();
-    }, 1000);
+    }, 10000);
 
     return () => clearInterval(interval);
   }, [web3, contractAddr]);
@@ -37,7 +34,10 @@ function Navbar() {
     <>
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
         <div className="container-fluid">
-          <NavLink className="navbar-brand" to="/candidates">
+          <NavLink
+            className="navbar-brand d-flex align-items-center"
+            to="/candidates"
+          >
             <img src="logo.png" alt="Logo" width="40" height="40" />
             ETHlection
           </NavLink>
