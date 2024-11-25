@@ -19,21 +19,19 @@
     </div>
     <p id="result"></p>
     <p><button id="connectButton">Connect to MetaMask</button></p>
-	<p><button id="restart">Restart</button></p>
+	<p><input type="text" id="restartPassword" placeholder="password: 123"><button id="restart">Restart</button></p>
 	<p>Add voter to election with extra information</p>
 	<p><input type="text" id="voterInfo" placeholder="Info"><button id="addVoter">Submit</button></p>
 	<p>Add candidate to election with extra information</p>
 	<p><input type="text" id="candidateInfo" placeholder="Info"><button id="addCandidate">Submit</button></p>	
 	<p><button id="getAllVoter">Get all voters</button></p>
-	<p><button id="getAllCandidate">Get all candidates</button></p>
-	<p>Whitelist voters in an array of addresses</p>
-	<p><input type="text" id="whitelistAddresses" placeholder="addr1, addr2, ..."><button id="whitelist">Submit</button></p>
+	<p><button id="getAllCandidate">Get all candidates</button></p>	
 	<p>Edit start/end time</p>
-	<p><input type="text" id="startTime" placeholder="in form of timestamp"><input type="text" id="endTime" placeholder="in form of timestamp"><button id="editTime">Submit</button></p>
+	<p><input type="text" id="startTime" placeholder="in form of timestamp"><input type="text" id="endTime" placeholder="in form of timestamp"><input type="text" id="editTimePassword" placeholder="password: 123"><button id="editTime">Submit</button></p>
 	<p><button id="getTime">Get start/end time</button></p>
-    <p><button id="agreeTime">Agree start/end time</button></p>
-	<p>Vote</p>
+    <p>Vote</p>
 	<p><input type="text" id="candidateAddress" placeholder="address"><button id="vote">Submit</button></p>
+	<p><button id="calWin">Calculate winning candidate</button></p>
 	<p><button id="getWin">Get winning candidate</button></p>
 </body>
 </html>

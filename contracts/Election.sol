@@ -6,18 +6,14 @@ contract Election {
     struct Candidate {
         address addr;
         uint votes;
-        bool agreeTime;
         string info;
     }
 
     struct Voter {
         address addr;
-        bool eligible;
         bool voted;
         uint candidateId;
 
-        address[] whitelistedBy;
-        uint whitelistCount;
         string info;
     }
 
@@ -34,28 +30,31 @@ contract Election {
 
     bool started;
     bool finished;
+    bool timeEdited = false;
 
     Candidate[] candidates;
     Voter[] voters;
 
     Candidate[] maxCandidate;
+    bool winnerFound = false;
 
-    address owner;
+    bytes32 passwordHash = 0x64e604787cbf194841e7b68d7cd28786f6c9a0a3ab9f8b0a0e87cb4387ab0107;   //123
 
     constructor() {
         winnerId = 0;
         started = false;
-        owner = msg.sender;
     }
 
-    // Restart election
-    function restart() external {
-        require(msg.sender == owner, "Only owner can restart");
+    // Restart election, need password
+    function restart(string memory password) external {
+        require(keccak256(abi.encodePacked(password)) == passwordHash, "Wrong password");
         winnerId = 0;
         started = false;
         finished = false;
         startTime = 0;
         endTime = 0;
+        timeEdited = false;
+        winnerFound = false;
         for (uint i = 0; i < numCandidates; i++) {
             candidateId[candidates[i].addr] = 0;
         }
@@ -73,11 +72,7 @@ contract Election {
     function checkStart() private returns (bool) {
         if (started)
             return true;
-        for (uint i = 0; i < numCandidates; i++) {
-            if (!candidates[i].agreeTime)
-                return false;
-        }
-        if (numCandidates == 0)
+        if (!timeEdited)
             return false;
         started = block.timestamp > startTime;
         return started;
@@ -95,69 +90,33 @@ contract Election {
     function addCandidate(string memory info) external {
         require(!checkStart(), "Already started");
         require(candidateId[msg.sender] == 0, "Candidate already added");
-        candidates.push(Candidate(msg.sender, 0, false, info));
+        candidates.push(Candidate(msg.sender, 0, info));
         numCandidates += 1;
         candidateId[msg.sender] = numCandidates;
-
-        // All voters become not eligible to vote
-        for (uint i = 0; i < numVoters; i++) {
-            voters[i].eligible = false;
-        }
     }
 
     // Add message sender as voter
     function addVoter(string memory info) external {
-        require(!checkStart(), "Already started");
+        // require(!checkStart(), "Already started");
         require(voterId[msg.sender] == 0, "Voter already added");
-        voters.push(Voter(msg.sender, false, false, 0, new address[](0), 0, info));
+        voters.push(Voter(msg.sender, false, 0, info));
         numVoters += 1;
         voterId[msg.sender] = numVoters;
     }
 
-    // Edit the start and end time of voting, it will apply only when all candidates agree
+    // Edit the start and end time of voting, need password
     // input format is timestamp, which only contains number
-    function editStartEndTimestamp(uint _startTime, uint _endTime) external {
-        require(candidateId[msg.sender] > 0, "Only candidate can change start/end time");
+    function editStartEndTimestamp(uint _startTime, uint _endTime, string memory password) external {
+        require(keccak256(abi.encodePacked(password)) == passwordHash, "Wrong password");
         require(!checkStart(), "Already started");
         startTime = _startTime;
         endTime = _endTime;
-        for (uint i = 0; i < numCandidates; i++) {
-            candidates[i].agreeTime = false;
-        }
+        timeEdited = true;
     }
 
     // Get start/end time
     function getStartEndTime() view external returns (uint, uint){
         return (startTime, endTime);
-    }
-
-    // Allow message sender (candidate) to agree start/end time
-    function agreeStartEndTime() external {
-        require(candidateId[msg.sender] > 0, "Only candidate can agree start/end time");
-        require(endTime != 0, "Start/end time has not been edited");
-        require(!checkStart(), "Already started, cannot change time.");
-        candidates[candidateId[msg.sender] - 1].agreeTime = true;
-    }
-
-    // For candidates to whitelist voters
-    function whitelistVoter(address[] memory _voters) external {
-        require(!finished, "Election has already finished");
-        require(candidateId[msg.sender] > 0, "Only candidate can whitelist the voter");
-
-        for (uint j = 0; j < _voters.length; j++) {
-            address _voter = _voters[j];
-            require(voterId[_voter] > 0, "Voter is not added");
-            Voter storage voter = voters[voterId[_voter] - 1];
-            require(!voter.eligible, "Voter is already eligible to vote");
-            for(uint i = 0; i < voter.whitelistCount; i ++) {
-                require(msg.sender != voter.whitelistedBy[i], "Voter has already been whitelisted by you");
-            }
-            voter.whitelistedBy.push(msg.sender);
-            voter.whitelistCount += 1;
-            if (voter.whitelistCount == numCandidates) {
-                voter.eligible = true;
-            }
-        }
     }
 
     // Allow voter vote
@@ -168,7 +127,6 @@ contract Election {
         // require(candidateId[msg.sender] == 0, "Only voters can cast vote");
         require(voterId[msg.sender] > 0, "Voter is not added in the election");
         Voter storage voter = voters[voterId[msg.sender] - 1];
-        require(voter.eligible, "Voter is not yet eligible to cast vote");
         require(!voter.voted, "Voter has already cast its vote");
         voter.candidateId = candidateId[_candidate];
         voter.voted = true;
@@ -207,15 +165,16 @@ contract Election {
                 maxCandidate.push(candidates[i]);
             }
         }
+        winnerFound = true;
     }
 
     // Get the winner
     function getWinningCandidate() external view returns(Candidate[] memory) {
+        require(winnerFound, "Need to find winner first");
         Candidate[] memory temp = new Candidate[](maxCandidate.length);
         for (uint i = 0; i < maxCandidate.length; i++) {
             temp[i] = maxCandidate[i];
         }
         return temp;
     }
-
 }

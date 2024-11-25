@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     const web3 = new Web3(window.ethereum);
     const compileData = "./Election.json";  // Path to compile data
-    const contractAddrHolesky = "0xf9E2e95C2c98c663f4709243ca12eD56C11C6F16";   // In holesky
-    const contractAddrSepolia = "0xe02E4499A241A87F81A8050d520027Bd0afa4988";   // In sepolia
+    const contractAddrHolesky = "0x0EA03c7971Af1E0b614B7016a6AB28de9d60F571";   // In holesky
+    const contractAddrSepolia = "0xd53E487c319265aB35553f735DCa065422E101be";   // In sepolia
     const contractAddrDict = {"Holesky": contractAddrHolesky, "Sepolia": contractAddrSepolia};
     let contractAddr;
 
@@ -67,8 +67,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById("restart").addEventListener("click", async () => {
         try {
-            await myContract.methods.restart().estimateGas({from: account});
-            await myContract.methods.restart().send({from: account})
+            const password = document.getElementById("restartPassword").value;
+            await myContract.methods.restart(password).estimateGas({from: account});
+            await myContract.methods.restart(password).send({from: account})
                 .on("receipt", function() {
                     console.log("Done");
                 })
@@ -116,27 +117,13 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(result);
     });
 
-    document.getElementById("whitelist").addEventListener("click", async() => {
-        try {
-            var addresses = document.getElementById("whitelistAddresses").value;
-            addresses = addresses.split(", ");
-            await myContract.methods.whitelistVoter(addresses).estimateGas({from: account});
-            await myContract.methods.whitelistVoter(addresses).send({from: account})
-                .on("receipt", function() {
-                    console.log("Done");
-                });
-        }
-        catch (e) {
-            console.log(e.data.message);
-        }
-    });
-
     document.getElementById("editTime").addEventListener("click", async() => {
         try {
             const startTime = document.getElementById("startTime").value;
             const endTime = document.getElementById("endTime").value;
-            await myContract.methods.editStartEndTimestamp(startTime,endTime).estimateGas({from: account});
-            await myContract.methods.editStartEndTimestamp(startTime,endTime).send({from: account})
+            const password = document.getElementById("editTimePassword").value;
+            await myContract.methods.editStartEndTimestamp(startTime,endTime, password).estimateGas({from: account});
+            await myContract.methods.editStartEndTimestamp(startTime,endTime, password).send({from: account})
                 .on("receipt", function() {
                     console.log("Done");
                 });
@@ -151,18 +138,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(result);
     })
 
-    document.getElementById("agreeTime").addEventListener("click", async() => {
-        try {
-            await myContract.methods.agreeStartEndTime().estimateGas({from: account});
-            await myContract.methods.agreeStartEndTime().send({from: account})
-                .on("receipt", function() {
-                    console.log("Done");
-                });
-        }
-        catch (e) {
-            console.log(e.data.message);
-        }
-    })
 
     document.getElementById("vote").addEventListener("click", async() => {
         try {
@@ -178,14 +153,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    document.getElementById("getWin").addEventListener("click", async() => {
+    document.getElementById("calWin").addEventListener("click", async() => {
         try {
             await myContract.methods.findWinningCandidate().estimateGas({from: account});
             await myContract.methods.findWinningCandidate().send({from: account})
                 .on("receipt", async function() {
-                    const result = await myContract.methods.getWinningCandidate().call();
-                    console.log(result);
+                    console.log("Done");
                 });
+        }
+        catch (e) {
+            console.log(e.data.message);
+        }
+    });
+
+    document.getElementById("getWin").addEventListener("click", async() => {
+        try {
+            await myContract.methods.getWinningCandidate().estimateGas({from: account});
+            const result = await myContract.methods.getWinningCandidate().call();
+            console.log(result);
         }
         catch (e) {
             console.log(e);
