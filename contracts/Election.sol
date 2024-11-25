@@ -13,6 +13,7 @@ contract Election {
         address addr;
         bool voted;
         uint candidateId;
+        uint sid;
 
         string info;
     }
@@ -22,6 +23,7 @@ contract Election {
 
     mapping(address => uint) candidateId;   // index = Id - 1
     mapping(address => uint) voterId;       // index = Id - 1
+    mapping(uint => uint) sidMap;
     
     uint winnerId;
 
@@ -38,16 +40,17 @@ contract Election {
     Candidate[] maxCandidate;
     bool winnerFound = false;
 
-    bytes32 passwordHash = 0x64e604787cbf194841e7b68d7cd28786f6c9a0a3ab9f8b0a0e87cb4387ab0107;   //123
+    address owner;
 
     constructor() {
         winnerId = 0;
         started = false;
+        owner = msg.sender;
     }
 
     // Restart election, need password
-    function restart(string memory password) external {
-        require(keccak256(abi.encodePacked(password)) == passwordHash, "Wrong password");
+    function restart() external {
+        require(msg.sender == owner, "Only owner can restart");
         winnerId = 0;
         started = false;
         finished = false;
@@ -60,6 +63,7 @@ contract Election {
         }
         for (uint i = 0; i < numVoters; i++) {
             voterId[voters[i].addr] = 0;
+            sidMap[voters[i].sid] = 0;
         }
         numCandidates = 0;
         numVoters = 0;
@@ -86,9 +90,17 @@ contract Election {
         return finished;
     }
 
+    function validSid(uint sid) private pure returns (bool) {
+        if (sid < 1000000000 || sid > 9999999999) {
+            return false;
+        }
+        return true;
+    }
+
     // Add message sender as one of the candidate
     function addCandidate(string memory info) external {
-        require(!checkStart(), "Already started");
+        // require(!checkStart(), "Already started");
+        require(voterId[msg.sender] > 0, "Please apply as voter first");
         require(candidateId[msg.sender] == 0, "Candidate already added");
         candidates.push(Candidate(msg.sender, 0, info));
         numCandidates += 1;
@@ -96,18 +108,21 @@ contract Election {
     }
 
     // Add message sender as voter
-    function addVoter(string memory info) external {
+    function addVoter(uint sid, string memory info) external {
         // require(!checkStart(), "Already started");
+        require(validSid(sid), "SID is not valid");
+        require(sidMap[sid] == 0, "SID already linked to another account");
         require(voterId[msg.sender] == 0, "Voter already added");
-        voters.push(Voter(msg.sender, false, 0, info));
+        voters.push(Voter(msg.sender, false, 0, sid, info));
         numVoters += 1;
         voterId[msg.sender] = numVoters;
+        sidMap[sid] = numVoters;
     }
 
     // Edit the start and end time of voting, need password
     // input format is timestamp, which only contains number
-    function editStartEndTimestamp(uint _startTime, uint _endTime, string memory password) external {
-        require(keccak256(abi.encodePacked(password)) == passwordHash, "Wrong password");
+    function editStartEndTimestamp(uint _startTime, uint _endTime) external {
+        require(msg.sender == owner, "Only owner can edit");
         require(!checkStart(), "Already started");
         startTime = _startTime;
         endTime = _endTime;

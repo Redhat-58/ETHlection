@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     const web3 = new Web3(window.ethereum);
     const compileData = "./Election.json";  // Path to compile data
-    const contractAddrHolesky = "0x0EA03c7971Af1E0b614B7016a6AB28de9d60F571";   // In holesky
-    const contractAddrSepolia = "0xd53E487c319265aB35553f735DCa065422E101be";   // In sepolia
+    const contractAddrHolesky = "0x0fd985d0b61f73dfC6AaBe7263B27eabA2b988bD";   // In holesky
+    //const contractAddrSepolia = "0xd53E487c319265aB35553f735DCa065422E101be";   // In sepolia (Not updated)
     const contractAddrDict = {"Holesky": contractAddrHolesky, "Sepolia": contractAddrSepolia};
     let contractAddr;
 
@@ -67,9 +67,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById("restart").addEventListener("click", async () => {
         try {
-            const password = document.getElementById("restartPassword").value;
-            await myContract.methods.restart(password).estimateGas({from: account});
-            await myContract.methods.restart(password).send({from: account})
+            await myContract.methods.restart().estimateGas({from: account});
+            await myContract.methods.restart().send({from: account})
                 .on("receipt", function() {
                     console.log("Done");
                 })
@@ -81,14 +80,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById("addVoter").addEventListener("click", async() => {
         try {
+            const sid = document.getElementById("voterSID").value;
             const info = document.getElementById("voterInfo").value;
-            await myContract.methods.addVoter(info).estimateGas({from: account})
-            await myContract.methods.addVoter(info).send({from: account})
+            await myContract.methods.addVoter(sid, info).estimateGas({from: account})
+            await myContract.methods.addVoter(sid, info).send({from: account})
                 .on("receipt", function() {
                     console.log("Done");
                 });
         }
-        catch (e) {
+        catch (e) {       
             console.log(e.data.message);
         }
     });
@@ -121,9 +121,8 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const startTime = document.getElementById("startTime").value;
             const endTime = document.getElementById("endTime").value;
-            const password = document.getElementById("editTimePassword").value;
-            await myContract.methods.editStartEndTimestamp(startTime,endTime, password).estimateGas({from: account});
-            await myContract.methods.editStartEndTimestamp(startTime,endTime, password).send({from: account})
+            await myContract.methods.editStartEndTimestamp(startTime,endTime).estimateGas({from: account});
+            await myContract.methods.editStartEndTimestamp(startTime,endTime).send({from: account})
                 .on("receipt", function() {
                     console.log("Done");
                 });
