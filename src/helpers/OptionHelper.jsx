@@ -36,9 +36,6 @@ const OptionHelper = () => {
     switch (option) {
       case "Apply as Candidate":
         await getAccount();
-        while (!accountAddr) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
 
         try {
           await contract.methods
@@ -56,9 +53,6 @@ const OptionHelper = () => {
         break;
       case "Register as Student":
         await getAccount();
-        while (!accountAddr) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
 
         try {
           await contract.methods
@@ -76,9 +70,6 @@ const OptionHelper = () => {
         break;
       case "Initiate an Election":
         await getAccount();
-        while (!accountAddr) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
 
         try {
           await contract.methods.restart().estimateGas({ from: accountAddr });
@@ -94,9 +85,6 @@ const OptionHelper = () => {
         break;
       case "End an Election":
         await getAccount();
-        while (!accountAddr) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
 
         try {
           await contract.methods.end().estimateGas({ from: accountAddr });
@@ -110,31 +98,8 @@ const OptionHelper = () => {
           console.error("Error ending election:", error);
         }
         break;
-      case "Whitelist Voters":
-        await getAccount();
-        while (!accountAddr) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
-
-        try {
-          await contract.methods
-            .whitelist(formData)
-            .estimateGas({ from: accountAddr });
-          await contract.methods
-            .whitelist(formData)
-            .send({ from: accountAddr })
-            .on("receipt", function () {
-              console.log("Voters whitelisted successfully");
-            });
-        } catch (error) {
-          console.error("Error whitelisting voters:", error);
-        }
-        break;
       case "View All Voters":
         await getAccount();
-        while (!accountAddr) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
 
         try {
           const result = await contract.methods.getAllVoters().call();
@@ -143,24 +108,8 @@ const OptionHelper = () => {
           console.error("Error viewing all voters:", error);
         }
         break;
-      case "View All Candidates":
-        await getAccount();
-        while (!accountAddr) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
-
-        try {
-          const result = await contract.methods.getAllCandidates().call();
-          console.log("All candidates:", result);
-        } catch (error) {
-          console.error("Error viewing all candidates:", error);
-        }
-        break;
       case "Edit Start Time":
         await getAccount();
-        while (!accountAddr) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
 
         try {
           await contract.methods
@@ -178,9 +127,6 @@ const OptionHelper = () => {
         break;
       case "Edit End Time":
         await getAccount();
-        while (!accountAddr) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
 
         try {
           await contract.methods
@@ -198,9 +144,6 @@ const OptionHelper = () => {
         break;
       case "View Time":
         await getAccount();
-        while (!accountAddr) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
 
         try {
           const result = await contract.methods.getStartEndTime().call();
@@ -211,9 +154,6 @@ const OptionHelper = () => {
         break;
       case "Agree Time":
         await getAccount();
-        while (!accountAddr) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
 
         try {
           await contract.methods
@@ -231,9 +171,6 @@ const OptionHelper = () => {
         break;
       case "View Winner":
         await getAccount();
-        while (!accountAddr) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
 
         try {
           const result = await contract.methods.getWinningCandidate().call();

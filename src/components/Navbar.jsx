@@ -4,7 +4,7 @@ import { Web3Context } from "../App";
 
 function Navbar() {
   const { web3, contractAddr } = useContext(Web3Context);
-  const [balance, setBalance] = useState("0.0000");
+  const [balance, setBalance] = useState("0.000");
 
   // Fetch balance
   useEffect(() => {
@@ -21,13 +21,6 @@ function Navbar() {
     };
 
     fetchBalance();
-
-    // Refresh balance every 10 second
-    const interval = setInterval(() => {
-      fetchBalance();
-    }, 10000);
-
-    return () => clearInterval(interval);
   }, [web3, contractAddr]);
 
   return (
@@ -35,7 +28,7 @@ function Navbar() {
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
         <div className="container-fluid">
           <NavLink
-            className="navbar-brand d-flex align-items-center"
+            className="navbar-brand d-flex align-items-center gap-2"
             to="/candidates"
           >
             <img src="logo.png" alt="Logo" width="40" height="40" />
@@ -45,22 +38,33 @@ function Navbar() {
             className="navbar-toggler"
             type="button"
             data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
             aria-expanded="false"
             aria-label="Toggle navigation"
           >
             <span className="navbar-toggler-icon"></span>
           </button>
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="navbar-nav nav-pills mx-auto mb-2 mb-lg-0">
+          <div className="collapse navbar-collapse" id="navbarNav">
+            <ul className="navbar-nav mx-auto gap-3">
               <li className="nav-item">
-                <NavLink className="nav-link" to="/candidates">
+                <NavLink
+                  className={({ isActive }) =>
+                    isActive ? "nav-link bg-dark text-white" : "nav-link"
+                  }
+                  to="/candidates"
+                >
                   Candidates
                 </NavLink>
               </li>
+              <div className="vr"></div>
               <li className="nav-item">
-                <NavLink className="nav-link" to="/cusis">
+                <NavLink
+                  className={({ isActive }) =>
+                    isActive ? "nav-link bg-dark text-white" : "nav-link"
+                  }
+                  to="/cusis"
+                >
                   CUSIS
                 </NavLink>
               </li>

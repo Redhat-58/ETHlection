@@ -7,19 +7,7 @@ function CandidateCard({
   description,
 }) {
   return (
-    <div
-      className="card"
-      style={{
-        backgroundColor: "#FFFFFF",
-        borderRadius: "5px",
-        padding: "20px",
-        margin: "10px",
-        height: "300px",
-        width: "400px",
-        textAlign: "center",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Adds a subtle shadow
-      }}
-    >
+    <div className="card p-3 m-3 flex-grow-1">
       <div className="card-body">
         <h5 className="card-title">{candidateName}</h5>
         <h6 className="card-subtitle mb-2 text-body-secondary">{suName}</h6>
@@ -27,6 +15,12 @@ function CandidateCard({
         <p className="card-text">College: {college}</p>
         <p className="card-text">Major: {major}</p>
         <p className="card-text">Description: {description}</p>
+        <button type="button" className="btn btn-outline-dark">
+          More
+        </button>
+        <button type="button" className="btn btn-dark">
+          Vote
+        </button>
       </div>
     </div>
   );

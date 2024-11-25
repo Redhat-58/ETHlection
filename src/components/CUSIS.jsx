@@ -1,67 +1,55 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { Web3Context } from "../App";
 import OptionCard from "./OptionCard";
 import Lightbox from "./Lightbox";
 
 function CUSIS() {
   const [selectedOption, setSelectedOption] = useState("");
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const { accountAddr } = useContext(Web3Context);
   const options = [
     {
-      id: 1,
-      title: "Apply as Candidate",
-      handler: () => handleOptionClick("Apply as Candidate"),
-    },
-    {
-      id: 2,
       title: "Register as Student",
+      restricted: false,
       handler: () => handleOptionClick("Register as Student"),
     },
     {
-      id: 3,
+      title: "Apply as Candidate",
+      restricted: false,
+      handler: () => handleOptionClick("Apply as Candidate"),
+    },
+    {
       title: "Initiate an Election",
+      restricted: true,
       handler: () => handleOptionClick("Initiate an Election"),
     },
     {
-      id: 4,
-      title: "Whitelist Voters",
-      handler: () => handleOptionClick("Whitelist Voters"),
-    },
-    {
-      id: 5,
-      title: "View All Voters",
-      handler: () => handleOptionClick("View All Voters"),
-    },
-    {
-      id: 6,
-      title: "View All Candidates",
-      handler: () => handleOptionClick("View All Candidates"),
-    },
-    {
-      id: 7,
       title: "Edit Start Time",
+      restricted: true,
       handler: () => handleOptionClick("Edit Start Time"),
     },
     {
-      id: 8,
       title: "Edit End Time",
+      restricted: true,
       handler: () => handleOptionClick("Edit End Time"),
     },
     {
-      id: 9,
+      title: "View All Voters",
+      restricted: true,
+      handler: () => handleOptionClick("View All Voters"),
+    },
+    {
       title: "View Time",
+      restricted: false,
       handler: () => handleOptionClick("View Time"),
     },
     {
-      id: 10,
-      title: "Agree Time",
-      handler: () => handleOptionClick("Agree Time"),
-    },
-    {
-      id: 11,
       title: "View Winner",
+      restricted: false,
       handler: () => handleOptionClick("View Winner"),
     },
   ];
+  const ownerAddress = "0x6bfA52F276D6Cd28625CF776ca37d77f233607Ef";
 
   // Handle click with different functions for each option
   const handleOptionClick = (option) => {
@@ -72,22 +60,21 @@ function CUSIS() {
 
   return (
     <>
-      <div style={{ display: "flex", flexWrap: "wrap" }}>
-        {options.map((option) => (
-          <OptionCard
-            key={option.id}
-            style={{
-              backgroundColor: "#FFFFFF",
-              borderRadius: "5px",
-              padding: "20px",
-              margin: "10px",
-              width: "200px",
-              textAlign: "center",
-            }}
-            optionName={option.title}
-            onClick={option.handler}
-          />
-        ))}
+      <div className="container">
+        <div className="row row-cols-2 row-cols-md-4 g-4 p-2">
+          {options
+            .filter(
+              (option) => !option.restricted || accountAddr === ownerAddress
+            )
+            .map((option) => (
+              <div className="col" key={option.title}>
+                <OptionCard
+                  optionName={option.title}
+                  onClick={option.handler}
+                />
+              </div>
+            ))}
+        </div>
       </div>
       <Lightbox
         isOpen={lightboxOpen}

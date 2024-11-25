@@ -42,7 +42,7 @@ function Lightbox({ isOpen, onClose, selectedOption }) {
         <div className="modal-footer">
           <button
             type="button"
-            className="btn btn-primary"
+            className="btn btn-dark"
             onClick={onButtonClick}
           >
             Proceed
@@ -58,14 +58,12 @@ function Lightbox({ isOpen, onClose, selectedOption }) {
       case "Apply as Candidate":
         return buildContent(true, "Info");
       case "Register as Student":
-        return buildContent(false);
+        return buildContent(true, "Student ID");
       case "Initiate an Election":
         return buildContent(false);
       case "Whitelist Voters":
         return buildContent(true, "Voters");
       case "View All Voters":
-        return buildContent(false);
-      case "View All Candidates":
         return buildContent(false);
       case "Edit Start Time":
         return buildContent(true, "Start Time");

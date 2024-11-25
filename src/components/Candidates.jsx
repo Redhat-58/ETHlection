@@ -1,40 +1,43 @@
+import { useContext, useEffect, useState } from "react";
+import { Web3Context } from "../App";
 import CandidateCard from "./CandidateCard";
 
-const candidates = [
-  {
-    id: 1,
-    suName: "SuperUnion",
-    CandidateName: "Alice",
-    yos: 1,
-    college: "United College",
-    major: "Computer Science",
-    description: "I will try my best",
-  },
-  {
-    id: 2,
-    suName: "HyperUnion",
-    CandidateName: "Bob",
-    yos: 2,
-    college: "Shaw College",
-    major: "Computer Engineering",
-    description: "Vote or die",
-  },
-];
-
 function Candidates() {
+  const { web3, contract } = useContext(Web3Context);
+  const [candidates, setCandidates] = useState([]);
+
+  // Fetch candidates from contract
+  useEffect(() => {
+    const fetchCandidates = async () => {
+      if (web3 && contract) {
+        try {
+          setCandidates(await contract.methods.getAllCandidates().call());
+        } catch (error) {
+          console.error("Error fetching candidates:", error);
+        }
+      }
+    };
+
+    fetchCandidates();
+  }, [web3, contract]);
+
   return (
-    <div style={{ display: "flex", flexWrap: "wrap" }}>
-      {candidates.map((candidate) => (
-        <CandidateCard
-          key={candidate.id}
-          suName={candidate.suName}
-          candidateName={candidate.CandidateName}
-          yos={candidate.yos}
-          college={candidate.college}
-          major={candidate.major}
-          description={candidate.description}
-        />
-      ))}
+    <div className="container d-flex justify-content-evenly flex-wrap flex-grow-1">
+      {candidates.length > 0 ? (
+        candidates.map((candidate) => (
+          <CandidateCard
+            key={candidate.id}
+            suName={candidate.suName}
+            candidateName={candidate.CandidateName}
+            yos={candidate.yos}
+            college={candidate.college}
+            major={candidate.major}
+            description={candidate.description}
+          />
+        ))
+      ) : (
+        <p className="text-center fs-2 fw-lighter ">No Ongoing Election.</p>
+      )}
     </div>
   );
 }
