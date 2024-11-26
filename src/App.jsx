@@ -61,6 +61,7 @@ function App() {
           <Routes>
             <Route path="/candidates" element={<Candidates />} />
             <Route path="/cusis" element={<CUSIS />} />
+            <Route path="*" element={<Candidates />} />
           </Routes>
         </div>
       </Router>
