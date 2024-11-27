@@ -1,24 +1,16 @@
 document.addEventListener('DOMContentLoaded', function() {
     const web3 = new Web3(window.ethereum);
     const compileData = "./Election.json";  // Path to compile data
-    const contractAddrHolesky = "0x0fd985d0b61f73dfC6AaBe7263B27eabA2b988bD";   // In holesky
-    //const contractAddrSepolia = "0xd53E487c319265aB35553f735DCa065422E101be";   // In sepolia (Not updated)
+    const abi = [ { "inputs": [ { "internalType": "string[]", "name": "info", "type": "string[]" } ], "name": "addCandidate", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "addr", "type": "address" } ], "name": "addOwner", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "sid", "type": "uint256" } ], "name": "addVoter", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "_startTime", "type": "uint256" }, { "internalType": "uint256", "name": "_endTime", "type": "uint256" } ], "name": "editStartEndTimestamp", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "findWinningCandidate", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "restart", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" }, { "inputs": [ { "internalType": "address", "name": "_candidate", "type": "address" } ], "name": "voteCandidate", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "addr", "type": "address" } ], "name": "checkOwner", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "getAllCandidates", "outputs": [ { "components": [ { "internalType": "address", "name": "addr", "type": "address" }, { "internalType": "uint256", "name": "votes", "type": "uint256" }, { "internalType": "string[]", "name": "info", "type": "string[]" } ], "internalType": "struct Election.Candidate[]", "name": "_addresses", "type": "tuple[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "getAllVoters", "outputs": [ { "components": [ { "internalType": "address", "name": "addr", "type": "address" }, { "internalType": "bool", "name": "voted", "type": "bool" }, { "internalType": "uint256", "name": "candidateId", "type": "uint256" }, { "internalType": "uint256", "name": "sid", "type": "uint256" } ], "internalType": "struct Election.Voter[]", "name": "addresses", "type": "tuple[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "getPastWinner", "outputs": [ { "components": [ { "internalType": "address", "name": "addr", "type": "address" }, { "internalType": "uint256", "name": "votes", "type": "uint256" }, { "internalType": "string[]", "name": "info", "type": "string[]" } ], "internalType": "struct Election.Candidate[]", "name": "", "type": "tuple[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "getStartEndTime", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" }, { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "getWinningCandidate", "outputs": [ { "components": [ { "internalType": "address", "name": "addr", "type": "address" }, { "internalType": "uint256", "name": "votes", "type": "uint256" }, { "internalType": "string[]", "name": "info", "type": "string[]" } ], "internalType": "struct Election.Candidate[]", "name": "", "type": "tuple[]" } ], "stateMutability": "view", "type": "function" } ]
+    const contractAddrHolesky = "0xdA7bf60CbCc79b25D733BEa1BC25173eA4Da76aF";   // In holesky
+    const contractAddrSepolia = "0xd53E487c319265aB35553f735DCa065422E101be";   // In sepolia (Not updated)
     const contractAddrDict = {"Holesky": contractAddrHolesky, "Sepolia": contractAddrSepolia};
     let contractAddr;
 
-
-    let metaData;
     let myContract;
     let account;
 
-    fetch(compileData)
-        .then(response => {
-            return response.json();
-        })
-        .then(data => {
-            metaData = data;
-            selectChain();
-        });
+
         
     const radios = document.getElementsByName("chain");
     function selectChain() {
@@ -26,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (radio.checked) {
                 contractAddr = contractAddrDict[radio.value];
                 console.log(radio.value);
-                myContract = new web3.eth.Contract(metaData.abi, contractAddr);
+                myContract = new web3.eth.Contract(abi, contractAddr);
                 console.log("Switch to " + radio.value);
             }
         }
@@ -36,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
         radio.addEventListener("change", selectChain);
     });
 
-    
+    selectChain();    
 
     document.getElementById("connectButton").addEventListener("click", async() => {
 
@@ -65,6 +57,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    document.getElementById("addOwner").addEventListener("click", async() => {
+        try {
+            const addr = document.getElementById("ownerAddr").value;
+            await myContract.methods.addOwner(addr).estimateGas({from: account});
+            await myContract.methods.addOwner(addr).send({from: account})
+                .on("receipt", function() {
+                    console.log("Done");
+                });
+        }
+        catch (e) {
+            console.log(e.data.message);
+        }
+    });
+
+    document.getElementById("checkOwner").addEventListener("click", async() => {
+        const addr = document.getElementById("checkIsAddr").value;
+        const result = await myContract.methods.checkOwner(addr).call();
+        console.log(result);
+    });
+
     document.getElementById("restart").addEventListener("click", async () => {
         try {
             await myContract.methods.restart().estimateGas({from: account});
@@ -81,9 +93,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("addVoter").addEventListener("click", async() => {
         try {
             const sid = document.getElementById("voterSID").value;
-            const info = document.getElementById("voterInfo").value;
-            await myContract.methods.addVoter(sid, info).estimateGas({from: account})
-            await myContract.methods.addVoter(sid, info).send({from: account})
+            await myContract.methods.addVoter(sid).estimateGas({from: account})
+            await myContract.methods.addVoter(sid).send({from: account})
                 .on("receipt", function() {
                     console.log("Done");
                 });
@@ -95,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById("addCandidate").addEventListener("click", async() => {
         try {
-            const info = document.getElementById("candidateInfo").value;
+            const info = document.getElementById("candidateInfo").value.split(", ");
             await myContract.methods.addCandidate(info).estimateGas({from: account})
             await myContract.methods.addCandidate(info).send({from: account})
                 .on("receipt", function() {
@@ -175,6 +186,11 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(e);
             console.log(e.data.message);
         }
+    });
+
+    document.getElementById("getPastWin").addEventListener("click", async() => {
+        const result = await myContract.methods.getPastWinner().call();
+        console.log(result);
     });
     
 

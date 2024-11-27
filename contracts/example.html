@@ -19,11 +19,15 @@
     </div>
     <p id="result"></p>
     <p><button id="connectButton">Connect to MetaMask</button></p>
+	<p>Add address to owner list</p>
+	<p><input type="text", id="ownerAddr" placeholder="addr"><button id="addOwner">Add</button></p>
+	<p>Check if address is one of the owner</p>
+	<p><input type="text", id="checkIsAddr" placeholder="addr"><button id="checkOwner">Check</button></p>
 	<p><button id="restart">Restart</button></p>
-	<p>Add voter to election with extra information</p>
-	<p><input type="text" id="voterSID" placeholder="SID"><input type="text" id="voterInfo" placeholder="Info"><button id="addVoter">Submit</button></p>
+	<p>Add voter to election with sid</p>
+	<p><input type="text" id="voterSID" placeholder="SID"><button id="addVoter">Submit</button></p>
 	<p>Add candidate to election with extra information</p>
-	<p><input type="text" id="candidateInfo" placeholder="Info"><button id="addCandidate">Submit</button></p>	
+	<p><input type="text" id="candidateInfo" placeholder="name, year, college, major, description"><button id="addCandidate">Submit</button></p>	
 	<p><button id="getAllVoter">Get all voters</button></p>
 	<p><button id="getAllCandidate">Get all candidates</button></p>	
 	<p>Edit start/end time</p>
@@ -33,5 +37,6 @@
 	<p><input type="text" id="candidateAddress" placeholder="address"><button id="vote">Submit</button></p>
 	<p><button id="calWin">Calculate winning candidate</button></p>
 	<p><button id="getWin">Get winning candidate</button></p>
+	<p><button id="getPastWin">Get past winning candidate</button></p>
 </body>
 </html>

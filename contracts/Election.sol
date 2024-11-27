@@ -6,7 +6,7 @@ contract Election {
     struct Candidate {
         address addr;
         uint votes;
-        string info;
+        string[] info;      // name, year, college, major, description
     }
 
     struct Voter {
@@ -14,8 +14,6 @@ contract Election {
         bool voted;
         uint candidateId;
         uint sid;
-
-        string info;
     }
 
     uint numCandidates = 0;
@@ -39,18 +37,19 @@ contract Election {
 
     Candidate[] maxCandidate;
     bool winnerFound = false;
+    Candidate[] pastWinner;
 
-    address owner;
+    address[] owner;
 
     constructor() {
         winnerId = 0;
         started = false;
-        owner = msg.sender;
+        owner.push(msg.sender);
     }
 
-    // Restart election, need password
+    // Restart election, need owner, will not reset pastWinner
     function restart() external {
-        require(msg.sender == owner, "Only owner can restart");
+        require(checkOwner(msg.sender), "Only owner can restart");
         winnerId = 0;
         started = false;
         finished = false;
@@ -70,6 +69,22 @@ contract Election {
         delete candidates;
         delete voters;  
         delete maxCandidate;
+    }
+
+    // Check if message sender is owner
+    function checkOwner(address addr) public view returns (bool) {
+        for (uint i = 0; i < owner.length; i++) {
+            if (owner[i] == addr) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Add address to owner
+    function addOwner(address addr) external {
+        require(checkOwner(msg.sender), "Not owner");
+        owner.push(addr);
     }
 
     // Check if voting time started
@@ -98,31 +113,32 @@ contract Election {
     }
 
     // Add message sender as one of the candidate
-    function addCandidate(string memory info) external {
+    function addCandidate(string[] memory info) external {
         // require(!checkStart(), "Already started");
         require(voterId[msg.sender] > 0, "Please apply as voter first");
         require(candidateId[msg.sender] == 0, "Candidate already added");
+        require(info.length == 5, "Info format not correct");
         candidates.push(Candidate(msg.sender, 0, info));
         numCandidates += 1;
         candidateId[msg.sender] = numCandidates;
     }
 
     // Add message sender as voter
-    function addVoter(uint sid, string memory info) external {
+    function addVoter(uint sid) external {
         // require(!checkStart(), "Already started");
         require(validSid(sid), "SID is not valid");
         require(sidMap[sid] == 0, "SID already linked to another account");
         require(voterId[msg.sender] == 0, "Voter already added");
-        voters.push(Voter(msg.sender, false, 0, sid, info));
+        voters.push(Voter(msg.sender, false, 0, sid));
         numVoters += 1;
         voterId[msg.sender] = numVoters;
         sidMap[sid] = numVoters;
     }
 
-    // Edit the start and end time of voting, need password
+    // Edit the start and end time of voting, need owner
     // input format is timestamp, which only contains number
     function editStartEndTimestamp(uint _startTime, uint _endTime) external {
-        require(msg.sender == owner, "Only owner can edit");
+        require(checkOwner(msg.sender), "Only owner can edit");
         require(!checkStart(), "Already started");
         startTime = _startTime;
         endTime = _endTime;
@@ -180,6 +196,11 @@ contract Election {
                 maxCandidate.push(candidates[i]);
             }
         }
+        if (!winnerFound) {
+            for (uint i = 0; i < maxCandidate.length; i++) {
+                pastWinner.push(maxCandidate[i]);
+            }
+        }
         winnerFound = true;
     }
 
@@ -191,5 +212,10 @@ contract Election {
             temp[i] = maxCandidate[i];
         }
         return temp;
+    }
+
+    // Get past winner
+    function getPastWinner() external view returns(Candidate[] memory) {
+        return pastWinner;
     }
 }
