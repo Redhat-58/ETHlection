@@ -7,7 +7,7 @@ function CandidateCard({
   description,
 }) {
   return (
-    <div className="card p-3 m-3 flex-grow-1">
+    <div className="card p-3 m-3 shadow-sm">
       <div className="card-body">
         <h5 className="card-title">{candidateName}</h5>
         <h6 className="card-subtitle mb-2 text-body-secondary">{suName}</h6>

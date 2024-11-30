@@ -25,3 +25,7 @@ dist-ssr
 
 # Environment variables
 .env
+
+# Experimental css folders
+css
+scss

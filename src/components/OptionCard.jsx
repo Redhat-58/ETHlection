@@ -1,24 +1,13 @@
 function OptionCard({ optionName, onClick }) {
   return (
     <div
-      className="card h-100"
-      style={{
-        cursor: "pointer", // Changes cursor to pointer on hover
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Adds a subtle shadow
-        transition: "transform 0.2s", // Adds a hover effect
-      }}
+      className="card shadow-sm pe-auto ratio ratio-1x1 "
+      // style={{ width: "16rem" }}
       onClick={onClick}
-      role="button" // Accessibility: Indicates the div is interactive
-      tabIndex="0" // Accessibility: Makes the div focusable
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "scale(1.05)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "scale(1)";
-      }}
+      role="button"
     >
-      <div className="card-body">
-        <h5 className="card-title fs-3 text-wrap text-center">{optionName}</h5>
+      <div className="card-body d-flex align-items-end">
+        <h1 className="card-title">{optionName}</h1>
       </div>
     </div>
   );

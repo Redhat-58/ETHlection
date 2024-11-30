@@ -6,44 +6,88 @@ function Lightbox({ isOpen, onClose, selectedOption }) {
   const { handleOption } = OptionHelper();
 
   const [formData, setFormData] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const onInputChange = (e) => {
     setFormData(e.target.value); // Update formData with the input value
   };
 
-  const onButtonClick = async () => {
-    console.log("Button clicked:", formData);
+  const onSubmitInput = async (e) => {
+    e.preventDefault();
+    setIsProcessing(true);
     await handleOption(selectedOption, formData);
+    setIsProcessing(false);
     onClose();
   };
 
-  const buildContent = (hasInput = false, labelName) => {
+  const buildContent = () => {
+    if (isProcessing) {
+      return (
+        <div className="modal-body">
+          <p>Processing..</p>
+        </div>
+      );
+    }
+
+    onSubmitInput({ preventDefault: () => {} });
+    return (
+      <div className="modal-body">
+        <p>Waiting for transaction...</p>
+      </div>
+    );
+  };
+
+  const buildContentWithInput = (labelName) => {
+    if (isProcessing) {
+      return (
+        <div className="modal-body">
+          <p>Processing..</p>
+        </div>
+      );
+    }
+
+    if (labelName === "Time") {
+      return (
+        <div className="modal-body">
+          <form onSubmit={onSubmitInput}>
+            <div className="mb-3">
+              <label htmlFor={`${labelName}-info`} className="col-form-label">
+                {labelName}:
+              </label>
+              <input
+                type="datetime-local"
+                className="form-control"
+                id={`${labelName}-info`}
+                onChange={onInputChange}
+              />
+            </div>
+          </form>
+        </div>
+      );
+    }
+
     return (
       <>
         <div className="modal-body">
-          {hasInput ? (
-            <form>
-              <div className="mb-3">
-                <label htmlFor={`${labelName}-info`} className="col-form-label">
-                  {labelName}:
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id={`${labelName}-info`}
-                  onChange={onInputChange}
-                />
-              </div>
-            </form>
-          ) : (
-            <p>Waiting for transaction.(Or result is printed to console)</p>
-          )}
+          <form onSubmit={onSubmitInput}>
+            <div className="mb-3">
+              <label htmlFor={`${labelName}-info`} className="col-form-label">
+                {labelName}:
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id={`${labelName}-info`}
+                onChange={onInputChange}
+              />
+            </div>
+          </form>
         </div>
         <div className="modal-footer">
           <button
             type="button"
             className="btn btn-dark"
-            onClick={onButtonClick}
+            onClick={onSubmitInput}
           >
             Proceed
           </button>
@@ -55,26 +99,22 @@ function Lightbox({ isOpen, onClose, selectedOption }) {
   const renderContent = () => {
     // Render lightbox content based on selected option
     switch (selectedOption) {
-      case "Apply as Candidate":
-        return buildContent(true, "Info");
       case "Register as Student":
-        return buildContent(true, "Student ID");
+        return buildContentWithInput("Student ID");
       case "Initiate an Election":
-        return buildContent(false);
-      case "Whitelist Voters":
-        return buildContent(true, "Voters");
+        return buildContent();
       case "View All Voters":
-        return buildContent(false);
-      case "Edit Start Time":
-        return buildContent(true, "Start Time");
-      case "Edit End Time":
-        return buildContent(true, "End Time");
+        return buildContent();
+      case "Edit Start/End Time":
+        return buildContentWithInput("Start/End Time");
       case "View Time":
-        return buildContent(false);
+        return buildContent();
       case "Agree Time":
-        return buildContent(false);
+        return buildContent();
       case "View Winner":
-        return buildContent(false);
+        return buildContent();
+      case "View Past Winners":
+        return buildContent();
       default:
         return (
           <>

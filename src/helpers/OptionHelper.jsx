@@ -12,12 +12,13 @@ const OptionHelper = () => {
       const web3 = new Web3(window.ethereum);
       if (web3) {
         // Wallet found
+        changeWeb3(web3);
         try {
-          await window.ethereum.request({ method: "eth_requestAccounts" });
-          changeWeb3(web3);
-
-          const accounts = await web3.eth.getAccounts();
+          const accounts = await window.ethereum.request({
+            method: "eth_requestAccounts",
+          });
           changeAccountAddr(accounts[0]);
+          localStorage.setItem("accountAddr", accounts[0]);
           console.log("Connected account:", accounts[0]);
         } catch (error) {
           console.error("User denied account access or error occurred:", error);
@@ -34,9 +35,35 @@ const OptionHelper = () => {
 
   const handleOption = async (option, formData) => {
     switch (option) {
+      case "Register as Student":
+        await getAccount();
+
+        try {
+          console.log("Account:", accountAddr);
+          await contract.methods.addVoter(formData).estimateGas({
+            from: accountAddr,
+          });
+          await contract.methods
+            .addVoter(formData)
+            .send({ from: accountAddr })
+            .on("receipt", function () {
+              console.log("Voter added successfully");
+            });
+        } catch (error) {
+          console.error("Error adding voter:", error);
+        }
+        break;
       case "Apply as Candidate":
         await getAccount();
 
+        console.log("Form data:", formData);
+        if (
+          !Array.isArray(formData) ||
+          formData.some((item) => typeof item !== "string")
+        ) {
+          console.error("Form data is not in the correct format");
+          return;
+        }
         try {
           await contract.methods
             .addCandidate(formData)
@@ -49,23 +76,6 @@ const OptionHelper = () => {
             });
         } catch (error) {
           console.error("Error adding candidate:", error);
-        }
-        break;
-      case "Register as Student":
-        await getAccount();
-
-        try {
-          await contract.methods
-            .addVoter("placeholderInfo")
-            .estimateGas({ from: accountAddr });
-          await contract.methods
-            .addVoter("placeholderInfo")
-            .send({ from: accountAddr })
-            .on("receipt", function () {
-              console.log("Voter added successfully");
-            });
-        } catch (error) {
-          console.error("Error adding voter:", error);
         }
         break;
       case "Initiate an Election":
@@ -83,21 +93,6 @@ const OptionHelper = () => {
           console.error("Error initiating election:", error);
         }
         break;
-      case "End an Election":
-        await getAccount();
-
-        try {
-          await contract.methods.end().estimateGas({ from: accountAddr });
-          await contract.methods
-            .end()
-            .send({ from: accountAddr })
-            .on("receipt", function () {
-              console.log("Election ended successfully");
-            });
-        } catch (error) {
-          console.error("Error ending election:", error);
-        }
-        break;
       case "View All Voters":
         await getAccount();
 
@@ -108,7 +103,9 @@ const OptionHelper = () => {
           console.error("Error viewing all voters:", error);
         }
         break;
-      case "Edit Start Time":
+      case "Edit Start/End Time":
+        const result = await contract.methods.getStartEndTime().call();
+        console.log(result);
         await getAccount();
 
         try {
@@ -123,23 +120,6 @@ const OptionHelper = () => {
             });
         } catch (error) {
           console.error("Error editing start time:", error);
-        }
-        break;
-      case "Edit End Time":
-        await getAccount();
-
-        try {
-          await contract.methods
-            .editEndTime(formData)
-            .estimateGas({ from: accountAddr });
-          await contract.methods
-            .editEndTime(formData)
-            .send({ from: accountAddr })
-            .on("receipt", function () {
-              console.log("End time edited successfully");
-            });
-        } catch (error) {
-          console.error("Error editing end time:", error);
         }
         break;
       case "View Time":
@@ -178,6 +158,17 @@ const OptionHelper = () => {
         } catch (error) {
           console.error("Error viewing winner:", error);
         }
+        break;
+      case "View Past Winners":
+        await getAccount();
+
+        try {
+          const result = await contract.methods.getPastWinner().call();
+          console.log("Past Winner:", result);
+        } catch (error) {
+          console.error("Error viewing past winners:", error);
+        }
+        break;
       default:
         console.error("Invalid option selected!");
     }
