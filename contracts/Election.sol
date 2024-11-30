@@ -117,7 +117,6 @@ contract Election {
         // require(!checkStart(), "Already started");
         require(voterId[msg.sender] > 0, "Please apply as voter first");
         require(candidateId[msg.sender] == 0, "Candidate already added");
-        require(info.length == 5, "Info format not correct");
         candidates.push(Candidate(msg.sender, 0, info));
         numCandidates += 1;
         candidateId[msg.sender] = numCandidates;
