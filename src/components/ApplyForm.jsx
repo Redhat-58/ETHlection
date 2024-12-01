@@ -3,12 +3,12 @@ import Lightbox from "./Lightbox";
 
 function ApplyForm() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  let formResult = [];
+  const [formResult, setFormResult] = useState([]);
 
   async function onSubmit(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
-    formResult = [
+    const formDataArray = [
       formData.get("suName"),
       formData.get("candidateName"),
       formData.get("yos"),
@@ -16,6 +16,7 @@ function ApplyForm() {
       formData.get("college"),
       formData.get("description"),
     ];
+    setFormResult(formDataArray);
     setLightboxOpen(true);
   }
 

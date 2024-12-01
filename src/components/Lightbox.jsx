@@ -87,7 +87,7 @@ function Lightbox({ isOpen, onClose, selectedOption, formResult = [] }) {
           <p>No result.</p>
         </div>
         <div className="modal-footer">
-          <button type="button" className="btn btn-primary" onClick={onClose}>
+          <button type="button" className="btn btn-dark" onClick={onClose}>
             Return
           </button>
         </div>
@@ -210,11 +210,7 @@ function Lightbox({ isOpen, onClose, selectedOption, formResult = [] }) {
               <p>Something went wrong.</p>
             </div>
             <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={onClose}
-              >
+              <button type="button" className="btn btn-dark" onClick={onClose}>
                 Return
               </button>
             </div>
