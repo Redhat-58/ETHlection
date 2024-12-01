@@ -61,13 +61,11 @@ contract Election {
             candidateId[candidates[i].addr] = 0;
         }
         for (uint i = 0; i < numVoters; i++) {
-            voterId[voters[i].addr] = 0;
-            sidMap[voters[i].sid] = 0;
+            voters[i].voted = false;
+            voters[i].candidateId = 0;
         }
         numCandidates = 0;
-        numVoters = 0;
         delete candidates;
-        delete voters;  
         delete maxCandidate;
     }
 
