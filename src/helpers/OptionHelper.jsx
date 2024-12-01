@@ -25,6 +25,7 @@ const OptionHelper = () => {
           changeAccountAddr(accounts[0]);
           localStorage.setItem("accountAddr", accounts[0]);
           console.log("Connected account:", accounts[0]);
+          return accounts[0];
         } catch (error) {
           console.error("User denied account access or error occurred:", error);
         }
@@ -35,53 +36,49 @@ const OptionHelper = () => {
     } else {
       // Account already connected
       console.log("Wallet already connected:", accountAddr);
+      return accountAddr;
     }
   };
 
   const handleOption = async (option, formData) => {
+    let account;
     switch (option) {
       case "Vote":
-        await getAccount();
+        account = await getAccount();
 
         try {
-          await contract.methods
-            .vote(formData)
-            .estimateGas({ from: accountAddr });
-          await contract.methods.vote(formData).send({ from: accountAddr });
+          await contract.methods.vote(formData).estimateGas({ from: account });
+          await contract.methods.vote(formData).send({ from: account });
           return "Voted successfully.";
         } catch (error) {
           return "Error voting.";
         }
       case "Register as Student":
-        await getAccount();
+        account = await getAccount();
 
         try {
           await contract.methods.addVoter(formData).estimateGas({
-            from: accountAddr,
+            from: account,
           });
-          await contract.methods.addVoter(formData).send({ from: accountAddr });
+          await contract.methods.addVoter(formData).send({ from: account });
           return "Voter added successfully.";
         } catch (error) {
           return "Error adding voter.";
         }
       case "Apply as Candidate":
-        await getAccount();
+        account = await getAccount();
 
         try {
           await contract.methods
             .addCandidate(formData)
-            .estimateGas({ from: accountAddr });
-          await contract.methods
-            .addCandidate(formData)
-            .send({ from: accountAddr });
+            .estimateGas({ from: account });
+          await contract.methods.addCandidate(formData).send({ from: account });
           return "Candidate added successfully.";
         } catch (error) {
           console.error("Error adding candidate:", error);
           return "Error adding candidate.";
         }
       case "View Time":
-        await getAccount();
-
         try {
           const result = await contract.methods.getStartEndTime().call();
           const startTime = new Date(Number(result[0]) * 1000).toLocaleString();
@@ -92,23 +89,24 @@ const OptionHelper = () => {
           return "Error viewing time.";
         }
       case "View Winner":
-        await getAccount();
+        account = await getAccount();
 
         try {
           await contract.methods
             .findWinningCandidate()
-            .estimateGas({ from: accountAddr });
-          await contract.methods
-            .findWinningCandidate()
-            .send({ from: accountAddr });
+            .estimateGas({ from: account });
+          await contract.methods.findWinningCandidate().send({ from: account });
           const result = await contract.methods.getWinningCandidate().call();
-          return result[0];
+          return result
+            .map(
+              (winner) =>
+                `Name: ${winner.info[0]}\nAddress: ${winner.address}\nVotes: ${winner.votes}`
+            )
+            .join("\n");
         } catch (error) {
           return "Error viewing winner.";
         }
       case "View Past Winners":
-        await getAccount();
-
         try {
           const result = await contract.methods.getPastWinner().call();
           const pastWinners = result.map((winner) => ({
@@ -116,44 +114,50 @@ const OptionHelper = () => {
             name: winner.info[0],
           }));
           return pastWinners
-            .map((winner) => `Name: ${winner.name}\nAddress: ${winner.address}`)
+            .map(
+              (winner) =>
+                `Name: ${winner.info[0]}\nAddress: ${winner.address}\nVotes: ${winner.votes}`
+            )
             .join("\n");
         } catch (error) {
           return "Error viewing past winners.";
         }
       case "View All Voters":
-        await getAccount();
-
         try {
           const result = await contract.methods.getAllVoters().call();
-          return result.map((voter) => voter.addr).join("\n");
+          return result
+            .map(
+              (voter) =>
+                `Address: ${voter.addr}\nVoted: ${voter.voted}\nCandidate ID: ${voter.candidateId}\nSID: ${voter.sid}`
+            )
+            .join("\n");
         } catch (error) {
           return "Error viewing all voters.";
         }
       case "Edit Start/End Time":
         const [startTime, endTime] = formData.split(",");
-        await getAccount();
+        account = await getAccount();
         const convertedStartTime = Number(startTime);
         const convertedEndTime = Number(endTime);
 
         try {
           await contract.methods
             .editStartEndTimestamp(convertedStartTime, convertedEndTime)
-            .estimateGas({ from: accountAddr });
+            .estimateGas({ from: account });
           await contract.methods
             .editStartEndTimestamp(convertedStartTime, convertedEndTime)
-            .send({ from: accountAddr });
+            .send({ from: account });
           changeEndTime(convertedEndTime);
           return "Start/End time edited successfully.";
         } catch (error) {
           return "Error editing start/end time.";
         }
       case "Initiate an Election":
-        await getAccount();
+        account = await getAccount();
 
         try {
-          await contract.methods.restart().estimateGas({ from: accountAddr });
-          await contract.methods.restart().send({ from: accountAddr });
+          await contract.methods.restart().estimateGas({ from: account });
+          await contract.methods.restart().send({ from: account });
           return "Election initiated successfully.";
         } catch (error) {
           return "Error initiating election.";
