@@ -40,7 +40,7 @@ const OptionHelper = () => {
     }
   };
 
-  const handleOption = async (option, formData) => {
+  const handleOption = async (option, formData, formResult = []) => {
     let account;
     switch (option) {
       case "Vote":
@@ -51,11 +51,14 @@ const OptionHelper = () => {
           await contract.methods.vote(formData).send({ from: account });
           return "Voted successfully.";
         } catch (error) {
-          return error.data.message;
+          if (error.data && error.data.message) {
+            return error.data.message;
+          } else {
+            return "Error voting.";
+          }
         }
       case "Register as Student":
         account = await getAccount();
-        console.log("Account:", account);
 
         try {
           await contract.methods.addVoter(formData).estimateGas({
@@ -64,20 +67,30 @@ const OptionHelper = () => {
           await contract.methods.addVoter(formData).send({ from: account });
           return "Voter added successfully.";
         } catch (error) {
-          return error.data.message;
+          if (error.data && error.data.message) {
+            return error.data.message;
+          } else {
+            return "Error adding voter.";
+          }
         }
       case "Apply as Candidate":
         account = await getAccount();
 
         try {
           await contract.methods
-            .addCandidate(formData)
+            .addCandidate(formResult)
             .estimateGas({ from: account });
-          await contract.methods.addCandidate(formData).send({ from: account });
+          await contract.methods
+            .addCandidate(formResult)
+            .send({ from: account });
           return "Candidate added successfully.";
         } catch (error) {
           console.error("Error adding candidate:", error);
-          return error.data.message;
+          if (error.data && error.data.message) {
+            return error.data.message;
+          } else {
+            return "Error adding candidate.";
+          }
         }
       case "View Time":
         try {
@@ -87,7 +100,11 @@ const OptionHelper = () => {
           return "Start Time: " + startTime + "\nEnd Time: " + endTime;
         } catch (error) {
           console.error("Error viewing time:", error);
-          return error.data.message;
+          if (error.data && error.data.message) {
+            return error.data.message;
+          } else {
+            return "Error viewing time.";
+          }
         }
       case "View Winner":
         account = await getAccount();
@@ -105,7 +122,11 @@ const OptionHelper = () => {
             )
             .join("\n");
         } catch (error) {
-          return error.data.message;
+          if (error.data && error.data.message) {
+            return error.data.message;
+          } else {
+            return "Error viewing winner.";
+          }
         }
       case "View Past Winners":
         try {
@@ -121,7 +142,11 @@ const OptionHelper = () => {
             )
             .join("\n");
         } catch (error) {
-          return error.data.message;
+          if (error.data && error.data.message) {
+            return error.data.message;
+          } else {
+            return "Error viewing past winners.";
+          }
         }
       case "View All Voters":
         try {
@@ -133,7 +158,11 @@ const OptionHelper = () => {
             )
             .join("\n");
         } catch (error) {
-          return error.data.message;
+          if (error.data && error.data.message) {
+            return error.data.message;
+          } else {
+            return "Error viewing all voters.";
+          }
         }
       case "Edit Start/End Time":
         const [startTime, endTime] = formData.split(",");
@@ -151,7 +180,11 @@ const OptionHelper = () => {
           changeEndTime(convertedEndTime);
           return "Start/End time edited successfully.";
         } catch (error) {
-          return error.data.message;
+          if (error.data && error.data.message) {
+            return error.data.message;
+          } else {
+            return "Error editing start/end time.";
+          }
         }
       case "Initiate an Election":
         account = await getAccount();
@@ -161,7 +194,11 @@ const OptionHelper = () => {
           await contract.methods.restart().send({ from: account });
           return "Election initiated successfully.";
         } catch (error) {
-          return error.data.message;
+          if (error.data && error.data.message) {
+            return error.data.message;
+          } else {
+            return "Error initiating election.";
+          }
         }
       default:
         return "Invalid option.";

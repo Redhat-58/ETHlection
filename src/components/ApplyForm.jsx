@@ -1,16 +1,14 @@
 import { useState } from "react";
-import OptionHelper from "../helpers/OptionHelper";
 import Lightbox from "./Lightbox";
 
 function ApplyForm() {
-  const { handleOption } = OptionHelper();
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [formResult, setformResult] = useState("");
+  let formResult = [];
 
   async function onSubmit(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
-    const formDataArray = [
+    formResult = [
       formData.get("suName"),
       formData.get("candidateName"),
       formData.get("yos"),
@@ -19,7 +17,6 @@ function ApplyForm() {
       formData.get("description"),
     ];
     setLightboxOpen(true);
-    setformResult(formDataArray);
   }
 
   return (

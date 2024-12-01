@@ -5,7 +5,7 @@ import { Web3Context } from "../App";
 function Navbar() {
   const { contract, endTime } = useContext(Web3Context);
   const [endDate, setEndDate] = useState(null);
-  const [timeLeft, setTimeLeft] = useState("");
+  const [timeLeft, setTimeLeft] = useState("No Ongoing Election");
 
   useEffect(() => {
     const fetchEndDate = async () => {
@@ -96,9 +96,7 @@ function Navbar() {
                 </NavLink>
               </li>
             </ul>
-            <span className="navbar-text">
-              {timeLeft && `Time left: ${timeLeft}`}
-            </span>
+            <span className="navbar-text">Time left: {timeLeft}</span>
           </div>
         </div>
       </nav>

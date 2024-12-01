@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import OptionHelper from "../helpers/OptionHelper";
 
-function Lightbox({ isOpen, onClose, selectedOption, formResult = "" }) {
+function Lightbox({ isOpen, onClose, selectedOption, formResult = [] }) {
   const { handleOption } = OptionHelper();
 
   const [formData, setFormData] = useState("");
@@ -36,10 +36,13 @@ function Lightbox({ isOpen, onClose, selectedOption, formResult = "" }) {
   const onSubmitInput = async (e) => {
     setIsProcessing(true);
     e.preventDefault();
-    if (formResult !== "") {
+    let returnedResult;
+    if (formResult.length > 0) {
       setFormData(formResult);
+      returnedResult = await handleOption(selectedOption, formData, formResult);
+    } else {
+      returnedResult = await handleOption(selectedOption, formData);
     }
-    const returnedResult = await handleOption(selectedOption, formData);
     setResult(returnedResult);
     setIsProcessing(false);
   };
