@@ -5,7 +5,7 @@ function ApplyForm() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [formResult, setFormResult] = useState([]);
 
-  async function onSubmit(event) {
+  function onSubmit(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
     const formDataArray = [

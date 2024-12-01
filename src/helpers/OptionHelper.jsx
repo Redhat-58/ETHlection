@@ -47,8 +47,12 @@ const OptionHelper = () => {
         account = await getAccount();
 
         try {
-          await contract.methods.vote(formData).estimateGas({ from: account });
-          await contract.methods.vote(formData).send({ from: account });
+          await contract.methods
+            .voteCandidate(formResult[0])
+            .estimateGas({ from: account });
+          await contract.methods
+            .voteCandidate(formResult[0])
+            .send({ from: account });
           return "Voted successfully.";
         } catch (error) {
           if (error.data && error.data.message) {
@@ -118,7 +122,7 @@ const OptionHelper = () => {
           return result
             .map(
               (winner) =>
-                `Name: ${winner.info[0]}\nAddress: ${winner.address}\nVotes: ${winner.votes}`
+                `Organization Name: ${winner.info[0]}\nName: ${winner.info[1]}\nAddress: ${winner.addr}\nVotes: ${winner.votes}`
             )
             .join("\n");
         } catch (error) {
@@ -133,14 +137,16 @@ const OptionHelper = () => {
           const result = await contract.methods.getPastWinner().call();
           const pastWinners = result.map((winner) => ({
             address: winner.addr,
-            name: winner.info[0],
+            suName: winner.info[0],
+            name: winner.info[1],
+            votes: winner.votes,
           }));
           return pastWinners
             .map(
               (winner) =>
-                `Name: ${winner.info[0]}\nAddress: ${winner.address}\nVotes: ${winner.votes}`
+                `Organization Name: ${winner.suName}\nName: ${winner.name}\nAddress: ${winner.address}\nVotes: ${winner.votes}`
             )
-            .join("\n");
+            .join("\n\n");
         } catch (error) {
           if (error.data && error.data.message) {
             return error.data.message;
@@ -192,6 +198,7 @@ const OptionHelper = () => {
         try {
           await contract.methods.restart().estimateGas({ from: account });
           await contract.methods.restart().send({ from: account });
+          changeEndTime(0);
           return "Election initiated successfully.";
         } catch (error) {
           if (error.data && error.data.message) {

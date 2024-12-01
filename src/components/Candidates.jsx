@@ -35,10 +35,8 @@ function Candidates() {
     fetchCandidates();
   }, [contract]);
 
-  const handleVote = async (candidateId) => {
-    console.log("Voting for candidate:", candidateId);
-    const returnedResult = await handleOption("Vote", candidateId);
-    setResult(returnedResult);
+  const handleVote = async (candidateAddr) => {
+    setResult([candidateAddr]);
     setLightboxOpen(true);
   };
 
@@ -63,7 +61,7 @@ function Candidates() {
             ))}
           </div>
         ) : (
-          <h2 className="text-center fw-lighter ">No Ongoing Election.</h2>
+          <h2 className="text-center fw-lighter ">No Candidates.</h2>
         )}
       </div>
       <Lightbox

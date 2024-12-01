@@ -187,6 +187,8 @@ function Lightbox({ isOpen, onClose, selectedOption, formResult = [] }) {
   const renderContent = () => {
     // Render lightbox content based on selected option
     switch (selectedOption) {
+      case "Vote":
+        return buildContent();
       case "Register as Student":
         return buildContentWithInput("Student ID");
       case "Apply as Candidate":
