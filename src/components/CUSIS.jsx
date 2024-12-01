@@ -22,21 +22,6 @@ function CUSIS() {
       handler: () => handleOptionClick("Apply as Candidate", true),
     },
     {
-      title: "Initiate an Election",
-      restricted: true,
-      handler: () => handleOptionClick("Initiate an Election", false),
-    },
-    {
-      title: "Edit Start/End Time",
-      restricted: true,
-      handler: () => handleOptionClick("Edit Start/End Time", false),
-    },
-    {
-      title: "View All Voters",
-      restricted: true,
-      handler: () => handleOptionClick("View All Voters", false),
-    },
-    {
       title: "View Time",
       restricted: false,
       handler: () => handleOptionClick("View Time", false),
@@ -50,6 +35,21 @@ function CUSIS() {
       title: "View Past Winners",
       restricted: false,
       handler: () => handleOptionClick("View Past Winners", false),
+    },
+    {
+      title: "View All Voters",
+      restricted: true,
+      handler: () => handleOptionClick("View All Voters", false),
+    },
+    {
+      title: "Edit Start/End Time",
+      restricted: true,
+      handler: () => handleOptionClick("Edit Start/End Time", false),
+    },
+    {
+      title: "Initiate an Election",
+      restricted: true,
+      handler: () => handleOptionClick("Initiate an Election", false),
     },
   ];
 
@@ -68,10 +68,7 @@ function CUSIS() {
     const checkOwner = async () => {
       if (contract && accountAddr) {
         try {
-          console.log("Address:", accountAddr);
-          // const addr = await contract.methods.checkOwner(accountAddr).call();
-          const addr = "0x6bfa52f276d6cd28625cf776ca37d77f233607ef";
-          if (accountAddr === addr) {
+          if (await contract.methods.checkOwner(accountAddr).call()) {
             setIsOwner(true);
           }
         } catch (error) {

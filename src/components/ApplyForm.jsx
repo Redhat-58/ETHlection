@@ -1,7 +1,11 @@
+import { useState } from "react";
 import OptionHelper from "../helpers/OptionHelper";
+import Lightbox from "./Lightbox";
 
 function ApplyForm() {
   const { handleOption } = OptionHelper();
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [result, setResult] = useState("");
 
   async function onSubmit(event) {
     event.preventDefault();
@@ -14,106 +18,120 @@ function ApplyForm() {
       formData.get("college"),
       formData.get("description"),
     ];
-    await handleOption("Apply as Candidate", formDataArray);
-    console.log("Form submitted");
+    setLightboxOpen(true);
+    const returnedResult = await handleOption(
+      "Apply as Candidate",
+      formDataArray
+    );
+    setResult(returnedResult);
   }
 
   return (
-    <div className="container-fluid bg-body-secondary">
-      <div class="row min-vh-100">
-        <div class="col" />
-        <div className="col-6 bg-white p-4">
-          <form onSubmit={onSubmit}>
-            <h2 className="text-center">Candidate Application Form</h2>
-            <div className="mb-3">
-              <label htmlFor="suName" className="form-label">
-                Organization Name
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                id="suName"
-                name="suName"
-                placeholder="E.g. CUnion"
-              />
-            </div>
-            <div className="mb-3">
-              <label htmlFor="candidateName" className="form-label">
-                Candidate Name
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                id="candidateName"
-                name="candidateName"
-                placeholder="E.g. John Doe"
-              />
-            </div>
-            <div className="mb-3">
-              <label htmlFor="yos" className="form-label">
-                Year of Study
-              </label>
-              <select className="form-select" name="yos">
-                <option>Select the year of study</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-              </select>
-            </div>
-            <div className="mb-3">
-              <label htmlFor="major" className="form-label">
-                Major
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                id="major"
-                name="major"
-                placeholder="E.g. Computer Science"
-              />
-            </div>
-            <div className="mb-3">
-              <label htmlFor="college" className="form-label">
-                College
-              </label>
-              <select className="form-select" name="college">
-                <option>Select a college</option>
-                <option value="Chung Chi College">Chung Chi College</option>
-                <option value="New Asia College">New Asia College</option>
-                <option value="United College">United College</option>
-                <option value="Shaw College">Shaw College</option>
-                <option value="Morningside College">Morningside College</option>
-                <option value="S.H. Ho College">S.H. Ho College</option>
-                <option value="CW Chu College">CW Chu College</option>
-                <option value="Wu Yee Sun College">Wu Yee Sun College</option>
-                <option value="Lee Woo Sing College">
-                  Lee Woo Sing College
-                </option>
-              </select>
-            </div>
-            <div className="mb-3">
-              <label htmlFor="description" className="form-label">
-                Description
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                id="descrption"
-                name="description"
-                placeholder="E.g. We will serve all CU students."
-              />
-            </div>
-            <button type="submit" className="btn btn-dark">
-              Submit
-            </button>
-          </form>
+    <>
+      <div className="container-fluid bg-body-secondary">
+        <div className="row min-vh-100">
+          <div className="col" />
+          <div className="col-6 bg-white p-4">
+            <form onSubmit={onSubmit}>
+              <h2 className="text-center">Candidate Application Form</h2>
+              <div className="mb-3">
+                <label htmlFor="suName" className="form-label">
+                  Organization Name
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="suName"
+                  name="suName"
+                  placeholder="E.g. CUnion"
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="candidateName" className="form-label">
+                  Candidate Name
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="candidateName"
+                  name="candidateName"
+                  placeholder="E.g. John Doe"
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="yos" className="form-label">
+                  Year of Study
+                </label>
+                <select className="form-select" name="yos">
+                  <option>Select the year of study</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                </select>
+              </div>
+              <div className="mb-3">
+                <label htmlFor="major" className="form-label">
+                  Major
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="major"
+                  name="major"
+                  placeholder="E.g. Computer Science"
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="college" className="form-label">
+                  College
+                </label>
+                <select className="form-select" name="college">
+                  <option>Select a college</option>
+                  <option value="Chung Chi College">Chung Chi College</option>
+                  <option value="New Asia College">New Asia College</option>
+                  <option value="United College">United College</option>
+                  <option value="Shaw College">Shaw College</option>
+                  <option value="Morningside College">
+                    Morningside College
+                  </option>
+                  <option value="S.H. Ho College">S.H. Ho College</option>
+                  <option value="CW Chu College">CW Chu College</option>
+                  <option value="Wu Yee Sun College">Wu Yee Sun College</option>
+                  <option value="Lee Woo Sing College">
+                    Lee Woo Sing College
+                  </option>
+                </select>
+              </div>
+              <div className="mb-3">
+                <label htmlFor="description" className="form-label">
+                  Description
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="descrption"
+                  name="description"
+                  placeholder="E.g. We will serve all CU students."
+                />
+              </div>
+              <button type="submit" className="btn btn-dark">
+                Submit
+              </button>
+            </form>
+          </div>
+          <div className="col" />
         </div>
-        <div class="col" />
       </div>
-    </div>
+      <Lightbox
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        selectedOption={"Apply as Candidate"}
+        formResult={result}
+      />
+    </>
   );
 }
 

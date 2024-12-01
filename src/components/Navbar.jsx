@@ -3,25 +3,48 @@ import { NavLink } from "react-router-dom";
 import { Web3Context } from "../App";
 
 function Navbar() {
-  const { web3, contract, contractAddr } = useContext(Web3Context);
-  const [balance, setBalance] = useState("0.000");
+  const { contract } = useContext(Web3Context);
+  const [endDate, setEndDate] = useState(null);
+  const [timeLeft, setTimeLeft] = useState("");
 
-  // Fetch balance
   useEffect(() => {
-    const fetchBalance = async () => {
+    const fetchEndDate = async () => {
       if (contract) {
         try {
-          const balanceWei = await web3.eth.getBalance(contractAddr);
-          const balanceEth = web3.utils.fromWei(balanceWei, "ether");
-          setBalance(Number(balanceEth).toPrecision(4));
+          const result = await contract.methods.getStartEndTime().call();
+          const endTime = Number(result[1]); // Assuming the end time is the second value
+          setEndDate(new Date(endTime * 1000)); // Convert to milliseconds
         } catch (error) {
-          console.error("Error fetching balance:", error);
+          console.error("Error fetching end date:", error);
         }
       }
     };
 
-    fetchBalance();
-  }, []);
+    fetchEndDate();
+  }, [contract]);
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      if (endDate) {
+        const now = new Date();
+        const difference = endDate - now;
+
+        if (difference > 0) {
+          const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+          const minutes = Math.floor((difference / 1000 / 60) % 60);
+          const seconds = Math.floor((difference / 1000) % 60);
+
+          setTimeLeft(`${hours}h ${minutes}m ${seconds}s`);
+        } else {
+          setTimeLeft("Election ended");
+        }
+      }
+    };
+
+    const timer = setInterval(calculateTimeLeft, 1000);
+
+    return () => clearInterval(timer);
+  }, [endDate]);
 
   return (
     <>
@@ -69,7 +92,9 @@ function Navbar() {
                 </NavLink>
               </li>
             </ul>
-            <span className="navbar-text">Contract Balance: {balance} ETH</span>
+            <span className="navbar-text">
+              {timeLeft && `Time left: ${timeLeft}`}
+            </span>
           </div>
         </div>
       </nav>

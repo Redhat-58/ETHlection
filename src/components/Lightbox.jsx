@@ -1,68 +1,135 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import OptionHelper from "../helpers/OptionHelper";
 
 function Lightbox({ isOpen, onClose, selectedOption }) {
-  if (!isOpen) return null;
   const { handleOption } = OptionHelper();
 
   const [formData, setFormData] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [result, setResult] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
 
   const onInputChange = (e) => {
-    setFormData(e.target.value); // Update formData with the input value
+    const { id, value } = e.target;
+    if (id === "startTime") {
+      setStartTime(value);
+      const startTimestamp = new Date(value).getTime() / 1000; // Convert to Unix timestamp
+      setFormData(`${startTimestamp},${endTime}`);
+    } else if (id === "endTime") {
+      setEndTime(value);
+      const endTimestamp = new Date(value).getTime() / 1000; // Convert to Unix timestamp
+      setFormData(`${startTime},${endTimestamp}`);
+    } else {
+      setFormData(value); // Update formData with the input value
+    }
   };
+
+  useEffect(() => {
+    if (startTime && endTime) {
+      const startTimestamp = new Date(startTime).getTime() / 1000;
+      const endTimestamp = new Date(endTime).getTime() / 1000;
+      setFormData(`${startTimestamp},${endTimestamp}`);
+    }
+  }, [startTime, endTime]);
 
   const onSubmitInput = async (e) => {
     e.preventDefault();
     setIsProcessing(true);
-    await handleOption(selectedOption, formData);
+    const returnedResult = await handleOption(selectedOption, formData);
     setIsProcessing(false);
-    onClose();
+    setResult(returnedResult);
   };
+
+  useEffect(() => {
+    setResult("");
+    if (
+      !["Register as Student", "Edit Start/End Time"].includes(selectedOption)
+    ) {
+      onSubmitInput({ preventDefault: () => {} });
+    }
+  }, [selectedOption]);
+
+  if (!isOpen) return null;
 
   const buildContent = () => {
     if (isProcessing) {
       return (
         <div className="modal-body">
-          <p>Processing..</p>
+          <p>Waiting for transaction...</p>
         </div>
       );
     }
 
-    onSubmitInput({ preventDefault: () => {} });
-    return (
-      <div className="modal-body">
-        <p>Waiting for transaction...</p>
-      </div>
-    );
+    if (result) {
+      return (
+        <div className="modal-body">
+          {result.includes(",") ? (
+            result.split(",").map((part, index) => <p key={index}>{part}</p>)
+          ) : (
+            <p>{result}</p>
+          )}
+        </div>
+      );
+    }
   };
 
   const buildContentWithInput = (labelName) => {
     if (isProcessing) {
       return (
         <div className="modal-body">
-          <p>Processing..</p>
+          <p>Waiting for transaction...</p>
         </div>
       );
     }
 
-    if (labelName === "Time") {
+    if (result) {
       return (
         <div className="modal-body">
-          <form onSubmit={onSubmitInput}>
-            <div className="mb-3">
-              <label htmlFor={`${labelName}-info`} className="col-form-label">
-                {labelName}:
-              </label>
-              <input
-                type="datetime-local"
-                className="form-control"
-                id={`${labelName}-info`}
-                onChange={onInputChange}
-              />
-            </div>
-          </form>
+          <p>{result}</p>
         </div>
+      );
+    }
+
+    if (selectedOption === "Edit Start/End Time") {
+      return (
+        <>
+          <div className="modal-body">
+            <form onSubmit={onSubmitInput}>
+              <div className="mb-3">
+                <label htmlFor="startTime" className="col-form-label">
+                  Start Time:
+                </label>
+                <input
+                  type="datetime-local"
+                  className="form-control"
+                  id="startTime"
+                  onChange={onInputChange}
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="endTime" className="col-form-label">
+                  End Time:
+                </label>
+                <input
+                  type="datetime-local"
+                  className="form-control"
+                  id="endTime"
+                  onChange={onInputChange}
+                />
+              </div>
+            </form>
+          </div>
+          <div className="modal-footer">
+            <button
+              type="button"
+              className="btn btn-dark"
+              onClick={onSubmitInput}
+            >
+              Proceed
+            </button>
+          </div>
+        </>
       );
     }
 
@@ -101,19 +168,19 @@ function Lightbox({ isOpen, onClose, selectedOption }) {
     switch (selectedOption) {
       case "Register as Student":
         return buildContentWithInput("Student ID");
-      case "Initiate an Election":
+      case "Apply as Candidate":
+        return buildContent();
+      case "View Time":
+        return buildContent();
+      case "View Winner":
+        return buildContent();
+      case "View Past Winners":
         return buildContent();
       case "View All Voters":
         return buildContent();
       case "Edit Start/End Time":
         return buildContentWithInput("Start/End Time");
-      case "View Time":
-        return buildContent();
-      case "Agree Time":
-        return buildContent();
-      case "View Winner":
-        return buildContent();
-      case "View Past Winners":
+      case "Initiate an Election":
         return buildContent();
       default:
         return (
@@ -144,7 +211,6 @@ function Lightbox({ isOpen, onClose, selectedOption }) {
         id="optionBox"
         tabIndex="-1"
         aria-labelledby="optionBoxLabel"
-        aria-hidden="true"
       >
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">

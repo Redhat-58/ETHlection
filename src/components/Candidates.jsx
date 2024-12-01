@@ -1,21 +1,32 @@
 import { useContext, useEffect, useState } from "react";
 import { Web3Context } from "../App";
 import CandidateCard from "./CandidateCard";
+import Lightbox from "./Lightbox";
+import OptionHelper from "../helpers/OptionHelper";
 
 function Candidates() {
+  const { handleOption } = OptionHelper();
   const { contract } = useContext(Web3Context);
   const [candidates, setCandidates] = useState([]);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [result, setResult] = useState("");
 
   // Fetch candidates from contract
   useEffect(() => {
     const fetchCandidates = async () => {
       if (contract) {
         try {
-          const candidateList = await contract.methods
-            .getAllCandidates()
-            .call();
-          console.log("Candidates fetched:", candidateList);
-          setCandidates(candidateList);
+          const result = await contract.methods.getStartEndTime().call();
+          const startTime = Number(result[0]);
+          const endTime = Number(result[1]);
+          const now = Math.floor(Date.now() / 1000); // Current time in seconds
+          if (now >= startTime && now <= endTime) {
+            const candidateList = await contract.methods
+              .getAllCandidates()
+              .call();
+            console.log("Candidates fetched:", candidateList);
+            setCandidates(candidateList);
+          }
         } catch (error) {
           console.error("Error fetching candidates:", error);
         }
@@ -25,28 +36,44 @@ function Candidates() {
     fetchCandidates();
   }, [contract]);
 
+  const handleVote = async (candidateId) => {
+    console.log("Voting for candidate:", candidateId);
+    const returnedResult = await handleOption("Vote", candidateId);
+    setResult(returnedResult);
+    setLightboxOpen(true);
+  };
+
   return (
-    <div className="container-fluid min-vh-100 bg-body-secondary p-4">
-      {candidates.length > 0 ? (
-        candidates.map((candidate) => (
+    <>
+      <div className="container-fluid min-vh-100 bg-body-secondary p-4">
+        {candidates.length > 0 ? (
           <div className="row row-cols-1 row-cols-md-3 g-4 p-4 mx-lg-5">
-            <div className="col">
-              <CandidateCard
-                key={candidate.id}
-                suName={candidate.info[0]}
-                candidateName={candidate.info[1]}
-                yos={candidate.info[2]}
-                major={candidate.info[3]}
-                college={candidate.info[4]}
-                description={candidate.info[5]}
-              />
-            </div>
+            {candidates.map((candidate, index) => (
+              <div className="col" key={index}>
+                <CandidateCard
+                  candidateAddr={candidate.addr}
+                  suName={candidate.info[0]}
+                  candidateName={candidate.info[1]}
+                  yos={candidate.info[2]}
+                  major={candidate.info[3]}
+                  college={candidate.info[4]}
+                  description={candidate.info[5]}
+                  onVote={handleVote}
+                />
+              </div>
+            ))}
           </div>
-        ))
-      ) : (
-        <h2 className="text-center fw-lighter ">No Ongoing Election.</h2>
-      )}
-    </div>
+        ) : (
+          <h2 className="text-center fw-lighter ">No Ongoing Election.</h2>
+        )}
+      </div>
+      <Lightbox
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        selectedOption={"Vote"}
+        formResult={result}
+      />
+    </>
   );
 }
 

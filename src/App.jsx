@@ -162,15 +162,16 @@ function App() {
       type: "function",
     },
   ];
-  const contractAddr = "0xdA7bf60CbCc79b25D733BEa1BC25173eA4Da76aF"; // Last deployed contract address
+  const contractAddr = "0x8A344f6b36fc3d6Ef96ed8b0Df19c8efa5BaB94D"; // Last deployed contract address
 
   useEffect(() => {
     if (!didInit) {
       didInit = true;
+      const newWeb3 = new Web3(window.ethereum);
       if (hasExistingAccount()) {
-        changeWeb3(new Web3(window.ethereum));
+        changeWeb3(newWeb3);
       }
-      setContract(new web3.eth.Contract(contractABI, contractAddr));
+      setContract(new newWeb3.eth.Contract(contractABI, contractAddr));
     }
 
     // Listen for account changes

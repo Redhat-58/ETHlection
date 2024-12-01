@@ -35,11 +35,27 @@ const OptionHelper = () => {
 
   const handleOption = async (option, formData) => {
     switch (option) {
+      case "Vote":
+        await getAccount();
+
+        try {
+          await contract.methods
+            .vote(formData)
+            .estimateGas({ from: accountAddr });
+          await contract.methods
+            .vote(formData)
+            .send({ from: accountAddr })
+            .on("receipt", function () {
+              return "Voted successfully.";
+            });
+        } catch (error) {
+          return "Error voting.";
+        }
+        break;
       case "Register as Student":
         await getAccount();
 
         try {
-          console.log("Account:", accountAddr);
           await contract.methods.addVoter(formData).estimateGas({
             from: accountAddr,
           });
@@ -47,24 +63,18 @@ const OptionHelper = () => {
             .addVoter(formData)
             .send({ from: accountAddr })
             .on("receipt", function () {
-              console.log("Voter added successfully");
+              return "Voter added successfully.";
             });
         } catch (error) {
-          console.error("Error adding voter:", error);
+          return "Error adding voter.";
         }
         break;
       case "Apply as Candidate":
         await getAccount();
 
-        console.log("Form data:", formData);
-        if (
-          !Array.isArray(formData) ||
-          formData.some((item) => typeof item !== "string")
-        ) {
-          console.error("Form data is not in the correct format");
-          return;
-        }
         try {
+          console.log("Form data after:", formData);
+          console.log("Account address:", accountAddr);
           await contract.methods
             .addCandidate(formData)
             .estimateGas({ from: accountAddr });
@@ -72,10 +82,77 @@ const OptionHelper = () => {
             .addCandidate(formData)
             .send({ from: accountAddr })
             .on("receipt", function () {
-              console.log("Candidate added successfully");
+              return "Candidate added successfully.";
             });
         } catch (error) {
           console.error("Error adding candidate:", error);
+          return "Error adding candidate.";
+        }
+        break;
+      case "View Time":
+        await getAccount();
+
+        try {
+          const result = await contract.methods.getStartEndTime().call();
+          return "Start Time: " + result[0] + " End Time: " + result[1];
+        } catch (error) {
+          return "Error viewing time.";
+        }
+        break;
+      case "View Winner":
+        await getAccount();
+
+        try {
+          await contract.methods
+            .findWinningCandidate()
+            .estimateGas({ from: accountAddr });
+          await contract.methods
+            .findWinningCandidate()
+            .send({ from: accountAddr });
+          const result = await contract.methods.getWinningCandidate().call();
+          return result[0];
+        } catch (error) {
+          return "Error viewing winner.";
+        }
+        break;
+      case "View Past Winners":
+        await getAccount();
+
+        try {
+          const result = await contract.methods.getPastWinner().call();
+          return result.join(", ");
+        } catch (error) {
+          return "Error viewing past winners.";
+        }
+        break;
+      case "View All Voters":
+        await getAccount();
+
+        try {
+          const result = await contract.methods.getAllVoters().call();
+          return result.map((voter) => voter.addr).join(", ");
+        } catch (error) {
+          return "Error viewing all voters.";
+        }
+        break;
+      case "Edit Start/End Time":
+        const [startTime, endTime] = formData.split(",");
+        await getAccount();
+        const convertedStartTime = Number(startTime);
+        const convertedEndTime = Number(endTime);
+
+        try {
+          await contract.methods
+            .editStartEndTimestamp(convertedStartTime, convertedEndTime)
+            .estimateGas({ from: accountAddr });
+          await contract.methods
+            .editStartEndTimestamp(convertedStartTime, convertedEndTime)
+            .send({ from: accountAddr })
+            .on("receipt", function () {
+              return "Start time edited successfully.";
+            });
+        } catch (error) {
+          return "Error editing start/end time.";
         }
         break;
       case "Initiate an Election":
@@ -87,90 +164,14 @@ const OptionHelper = () => {
             .restart()
             .send({ from: accountAddr })
             .on("receipt", function () {
-              console.log("Election initiated successfully");
+              return "Election initiated successfully.";
             });
         } catch (error) {
-          console.error("Error initiating election:", error);
-        }
-        break;
-      case "View All Voters":
-        await getAccount();
-
-        try {
-          const result = await contract.methods.getAllVoters().call();
-          console.log("All voters:", result);
-        } catch (error) {
-          console.error("Error viewing all voters:", error);
-        }
-        break;
-      case "Edit Start/End Time":
-        const result = await contract.methods.getStartEndTime().call();
-        console.log(result);
-        await getAccount();
-
-        try {
-          await contract.methods
-            .editStartTime(formData)
-            .estimateGas({ from: accountAddr });
-          await contract.methods
-            .editStartTime(formData)
-            .send({ from: accountAddr })
-            .on("receipt", function () {
-              console.log("Start time edited successfully");
-            });
-        } catch (error) {
-          console.error("Error editing start time:", error);
-        }
-        break;
-      case "View Time":
-        await getAccount();
-
-        try {
-          const result = await contract.methods.getStartEndTime().call();
-          console.log("Current time:", result);
-        } catch (error) {
-          console.error("Error viewing time:", error);
-        }
-        break;
-      case "Agree Time":
-        await getAccount();
-
-        try {
-          await contract.methods
-            .agreeStartEndTime()
-            .estimateGas({ from: accountAddr });
-          await contract.methods
-            .agreeStartEndTime()
-            .send({ from: accountAddr })
-            .on("receipt", function () {
-              console.log("Time agreed successfully");
-            });
-        } catch (error) {
-          console.error("Error agreeing time:", error);
-        }
-        break;
-      case "View Winner":
-        await getAccount();
-
-        try {
-          const result = await contract.methods.getWinningCandidate().call();
-          console.log("Winner:", result);
-        } catch (error) {
-          console.error("Error viewing winner:", error);
-        }
-        break;
-      case "View Past Winners":
-        await getAccount();
-
-        try {
-          const result = await contract.methods.getPastWinner().call();
-          console.log("Past Winner:", result);
-        } catch (error) {
-          console.error("Error viewing past winners:", error);
+          return "Error initiating election.";
         }
         break;
       default:
-        console.error("Invalid option selected!");
+        return "Invalid option.";
     }
   };
 
