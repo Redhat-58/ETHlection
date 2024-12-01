@@ -51,10 +51,11 @@ const OptionHelper = () => {
           await contract.methods.vote(formData).send({ from: account });
           return "Voted successfully.";
         } catch (error) {
-          return "Error voting.";
+          return error.data.message;
         }
       case "Register as Student":
         account = await getAccount();
+        console.log("Account:", account);
 
         try {
           await contract.methods.addVoter(formData).estimateGas({
@@ -63,7 +64,7 @@ const OptionHelper = () => {
           await contract.methods.addVoter(formData).send({ from: account });
           return "Voter added successfully.";
         } catch (error) {
-          return "Error adding voter.";
+          return error.data.message;
         }
       case "Apply as Candidate":
         account = await getAccount();
@@ -76,7 +77,7 @@ const OptionHelper = () => {
           return "Candidate added successfully.";
         } catch (error) {
           console.error("Error adding candidate:", error);
-          return "Error adding candidate.";
+          return error.data.message;
         }
       case "View Time":
         try {
@@ -86,7 +87,7 @@ const OptionHelper = () => {
           return "Start Time: " + startTime + "\nEnd Time: " + endTime;
         } catch (error) {
           console.error("Error viewing time:", error);
-          return "Error viewing time.";
+          return error.data.message;
         }
       case "View Winner":
         account = await getAccount();
@@ -104,7 +105,7 @@ const OptionHelper = () => {
             )
             .join("\n");
         } catch (error) {
-          return "Error viewing winner.";
+          return error.data.message;
         }
       case "View Past Winners":
         try {
@@ -120,7 +121,7 @@ const OptionHelper = () => {
             )
             .join("\n");
         } catch (error) {
-          return "Error viewing past winners.";
+          return error.data.message;
         }
       case "View All Voters":
         try {
@@ -132,7 +133,7 @@ const OptionHelper = () => {
             )
             .join("\n");
         } catch (error) {
-          return "Error viewing all voters.";
+          return error.data.message;
         }
       case "Edit Start/End Time":
         const [startTime, endTime] = formData.split(",");
@@ -150,7 +151,7 @@ const OptionHelper = () => {
           changeEndTime(convertedEndTime);
           return "Start/End time edited successfully.";
         } catch (error) {
-          return "Error editing start/end time.";
+          return error.data.message;
         }
       case "Initiate an Election":
         account = await getAccount();
@@ -160,7 +161,7 @@ const OptionHelper = () => {
           await contract.methods.restart().send({ from: account });
           return "Election initiated successfully.";
         } catch (error) {
-          return "Error initiating election.";
+          return error.data.message;
         }
       default:
         return "Invalid option.";
