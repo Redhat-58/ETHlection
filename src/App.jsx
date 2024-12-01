@@ -15,7 +15,9 @@ function App() {
   );
   const [accountAddr, setAccountAddr] = useState("");
   const [contract, setContract] = useState(null);
+  const [endTime, setEndTime] = useState(null);
   const contractABI = [
+    { inputs: [], stateMutability: "nonpayable", type: "constructor" },
     {
       inputs: [{ internalType: "string[]", name: "info", type: "string[]" }],
       name: "addCandidate",
@@ -38,6 +40,13 @@ function App() {
       type: "function",
     },
     {
+      inputs: [{ internalType: "address", name: "addr", type: "address" }],
+      name: "checkOwner",
+      outputs: [{ internalType: "bool", name: "", type: "bool" }],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
       inputs: [
         { internalType: "uint256", name: "_startTime", type: "uint256" },
         { internalType: "uint256", name: "_endTime", type: "uint256" },
@@ -52,30 +61,6 @@ function App() {
       name: "findWinningCandidate",
       outputs: [],
       stateMutability: "nonpayable",
-      type: "function",
-    },
-    {
-      inputs: [],
-      name: "restart",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-    { inputs: [], stateMutability: "nonpayable", type: "constructor" },
-    {
-      inputs: [
-        { internalType: "address", name: "_candidate", type: "address" },
-      ],
-      name: "voteCandidate",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-    {
-      inputs: [{ internalType: "address", name: "addr", type: "address" }],
-      name: "checkOwner",
-      outputs: [{ internalType: "bool", name: "", type: "bool" }],
-      stateMutability: "view",
       type: "function",
     },
     {
@@ -161,8 +146,24 @@ function App() {
       stateMutability: "view",
       type: "function",
     },
+    {
+      inputs: [],
+      name: "restart",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        { internalType: "address", name: "_candidate", type: "address" },
+      ],
+      name: "voteCandidate",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
   ];
-  const contractAddr = "0x8A344f6b36fc3d6Ef96ed8b0Df19c8efa5BaB94D"; // Last deployed contract address
+  const contractAddr = "0x360699EC289132220526Eb4B82f2629f88bb1A77"; // Last deployed contract address
 
   useEffect(() => {
     if (!didInit) {
@@ -176,7 +177,6 @@ function App() {
 
     // Listen for account changes
     window.ethereum.on("accountsChanged", (accounts) => {
-      console.log("Account changed:", accounts[0]);
       if (accounts.length > 0) {
         setAccountAddr(accounts[0]);
         localStorage.setItem("accountAddr", accounts[0]);
@@ -204,6 +204,10 @@ function App() {
     setAccountAddr(accountAddr);
   };
 
+  const changeEndTime = (endTime) => {
+    setEndTime(endTime);
+  };
+
   return (
     <Web3Context.Provider
       value={{
@@ -211,8 +215,10 @@ function App() {
         accountAddr,
         contract,
         contractAddr,
+        endTime,
         changeWeb3,
         changeAccountAddr,
+        changeEndTime,
       }}
     >
       <Router>

@@ -70,6 +70,8 @@ function CUSIS() {
         try {
           if (await contract.methods.checkOwner(accountAddr).call()) {
             setIsOwner(true);
+          } else {
+            setIsOwner(false);
           }
         } catch (error) {
           console.error("Error checking owner status:", error);
@@ -78,7 +80,7 @@ function CUSIS() {
     };
 
     checkOwner();
-  }, [accountAddr]);
+  }, [accountAddr, contract]);
 
   return (
     <>

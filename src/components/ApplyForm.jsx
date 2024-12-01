@@ -5,7 +5,7 @@ import Lightbox from "./Lightbox";
 function ApplyForm() {
   const { handleOption } = OptionHelper();
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [result, setResult] = useState("");
+  const [formResult, setformResult] = useState("");
 
   async function onSubmit(event) {
     event.preventDefault();
@@ -19,11 +19,7 @@ function ApplyForm() {
       formData.get("description"),
     ];
     setLightboxOpen(true);
-    const returnedResult = await handleOption(
-      "Apply as Candidate",
-      formDataArray
-    );
-    setResult(returnedResult);
+    setformResult(formDataArray);
   }
 
   return (
@@ -129,7 +125,7 @@ function ApplyForm() {
         isOpen={lightboxOpen}
         onClose={() => setLightboxOpen(false)}
         selectedOption={"Apply as Candidate"}
-        formResult={result}
+        formResult={formResult}
       />
     </>
   );

@@ -24,7 +24,6 @@ function Candidates() {
             const candidateList = await contract.methods
               .getAllCandidates()
               .call();
-            console.log("Candidates fetched:", candidateList);
             setCandidates(candidateList);
           }
         } catch (error) {

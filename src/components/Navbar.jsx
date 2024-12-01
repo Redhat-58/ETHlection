@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { Web3Context } from "../App";
 
 function Navbar() {
-  const { contract } = useContext(Web3Context);
+  const { contract, endTime } = useContext(Web3Context);
   const [endDate, setEndDate] = useState(null);
   const [timeLeft, setTimeLeft] = useState("");
 
@@ -11,9 +11,13 @@ function Navbar() {
     const fetchEndDate = async () => {
       if (contract) {
         try {
-          const result = await contract.methods.getStartEndTime().call();
-          const endTime = Number(result[1]); // Assuming the end time is the second value
-          setEndDate(new Date(endTime * 1000)); // Convert to milliseconds
+          if (!endDate) {
+            const result = await contract.methods.getStartEndTime().call();
+            const endTime = new Date(Number(result[1]) * 1000);
+            setEndDate(new Date(endTime)); // Convert to milliseconds
+          } else {
+            setEndDate(new Date(Number(endTime) * 1000)); // Convert to milliseconds
+          }
         } catch (error) {
           console.error("Error fetching end date:", error);
         }
@@ -21,7 +25,7 @@ function Navbar() {
     };
 
     fetchEndDate();
-  }, [contract]);
+  }, [endTime, contract]);
 
   useEffect(() => {
     const calculateTimeLeft = () => {

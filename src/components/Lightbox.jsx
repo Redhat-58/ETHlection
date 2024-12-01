@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import OptionHelper from "../helpers/OptionHelper";
 
-function Lightbox({ isOpen, onClose, selectedOption }) {
+function Lightbox({ isOpen, onClose, selectedOption, formResult = "" }) {
   const { handleOption } = OptionHelper();
 
   const [formData, setFormData] = useState("");
@@ -34,11 +34,14 @@ function Lightbox({ isOpen, onClose, selectedOption }) {
   }, [startTime, endTime]);
 
   const onSubmitInput = async (e) => {
-    e.preventDefault();
     setIsProcessing(true);
+    e.preventDefault();
+    if (formResult !== "") {
+      setFormData(formResult);
+    }
     const returnedResult = await handleOption(selectedOption, formData);
-    setIsProcessing(false);
     setResult(returnedResult);
+    setIsProcessing(false);
   };
 
   useEffect(() => {
@@ -46,9 +49,11 @@ function Lightbox({ isOpen, onClose, selectedOption }) {
     if (
       !["Register as Student", "Edit Start/End Time"].includes(selectedOption)
     ) {
-      onSubmitInput({ preventDefault: () => {} });
+      if (isOpen) {
+        onSubmitInput({ preventDefault: () => {} });
+      }
     }
-  }, [selectedOption]);
+  }, [selectedOption, isOpen]);
 
   if (!isOpen) return null;
 
@@ -64,14 +69,27 @@ function Lightbox({ isOpen, onClose, selectedOption }) {
     if (result) {
       return (
         <div className="modal-body">
-          {result.includes(",") ? (
-            result.split(",").map((part, index) => <p key={index}>{part}</p>)
+          {result.includes("\n") ? (
+            result.split("\n").map((part, index) => <p key={index}>{part}</p>)
           ) : (
             <p>{result}</p>
           )}
         </div>
       );
     }
+
+    return (
+      <>
+        <div className="modal-body">
+          <p>No result.</p>
+        </div>
+        <div className="modal-footer">
+          <button type="button" className="btn btn-primary" onClick={onClose}>
+            Return
+          </button>
+        </div>
+      </>
+    );
   };
 
   const buildContentWithInput = (labelName) => {
