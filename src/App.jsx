@@ -12,7 +12,7 @@ let didInit = false;
 function App() {
   const [web3, setWeb3] = useState(
     new Web3("https://ethereum-holesky-rpc.publicnode.com")
-  );
+  ); // Default to Holesky RPC
   const [accountAddr, setAccountAddr] = useState("");
   const [contract, setContract] = useState(null);
   const [endTime, setEndTime] = useState(null);
@@ -165,6 +165,7 @@ function App() {
   ];
   const contractAddr = "0x360699EC289132220526Eb4B82f2629f88bb1A77"; // Last deployed contract address
 
+  // Initialize web3 and contract
   useEffect(() => {
     if (!didInit) {
       didInit = true;
@@ -209,6 +210,7 @@ function App() {
   };
 
   return (
+    // Export Web3 related states and functions to children components
     <Web3Context.Provider
       value={{
         web3,

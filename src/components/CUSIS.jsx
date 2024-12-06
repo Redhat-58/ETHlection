@@ -4,6 +4,7 @@ import { Web3Context } from "../App";
 import OptionCard from "./OptionCard";
 import Lightbox from "./Lightbox";
 
+// CUSIS Page
 function CUSIS() {
   const [selectedOption, setSelectedOption] = useState("");
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -64,6 +65,7 @@ function CUSIS() {
     }
   };
 
+  // Check if the current account is the owner for restricted options
   useEffect(() => {
     const checkOwner = async () => {
       if (contract && accountAddr) {

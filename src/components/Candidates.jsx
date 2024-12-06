@@ -4,6 +4,7 @@ import CandidateCard from "./CandidateCard";
 import Lightbox from "./Lightbox";
 import OptionHelper from "../helpers/OptionHelper";
 
+// Candidates Page
 function Candidates() {
   const { handleOption } = OptionHelper();
   const { contract } = useContext(Web3Context);

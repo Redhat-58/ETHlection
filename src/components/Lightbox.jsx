@@ -25,6 +25,7 @@ function Lightbox({ isOpen, onClose, selectedOption, formResult = [] }) {
     }
   };
 
+  // If current option is "Edit Start/End Time", update formData with the selected start and end time
   useEffect(() => {
     if (startTime && endTime) {
       const startTimestamp = new Date(startTime).getTime() / 1000;
@@ -33,6 +34,7 @@ function Lightbox({ isOpen, onClose, selectedOption, formResult = [] }) {
     }
   }, [startTime, endTime]);
 
+  // Call handleOption function and display the result in the lightbox
   const onSubmitInput = async (e) => {
     setIsProcessing(true);
     e.preventDefault();
@@ -47,6 +49,7 @@ function Lightbox({ isOpen, onClose, selectedOption, formResult = [] }) {
     setIsProcessing(false);
   };
 
+  // Call onSubmitInput function when the lightbox is opened
   useEffect(() => {
     setResult("");
     if (
@@ -58,8 +61,10 @@ function Lightbox({ isOpen, onClose, selectedOption, formResult = [] }) {
     }
   }, [selectedOption, isOpen]);
 
+  // Do not render lightbox if option has not been selected in CUSIS
   if (!isOpen) return null;
 
+  // Build lightbox content for options without input
   const buildContent = () => {
     if (isProcessing) {
       return (

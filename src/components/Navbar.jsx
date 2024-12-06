@@ -45,11 +45,13 @@ function Navbar() {
       }
     };
 
+    // Update time left every second
     const timer = setInterval(calculateTimeLeft, 1000);
 
     return () => clearInterval(timer);
   }, [endDate]);
 
+  // Navigation bar definition
   return (
     <>
       <nav className="navbar navbar-expand-lg bg-body-tertiary shadow-sm">

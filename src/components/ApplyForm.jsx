@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Lightbox from "./Lightbox";
 
+// Candidate Application Form
 function ApplyForm() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [formResult, setFormResult] = useState([]);
