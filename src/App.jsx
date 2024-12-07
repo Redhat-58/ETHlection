@@ -223,7 +223,7 @@ function App() {
         changeEndTime,
       }}
     >
-      <Router>
+      <Router basename="/ETHlection">
         <div>
           <Navbar />
           <Routes>
