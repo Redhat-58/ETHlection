@@ -6,7 +6,6 @@ import OptionHelper from "../helpers/OptionHelper";
 
 // Candidates Page
 function Candidates() {
-  const { handleOption } = OptionHelper();
   const { contract } = useContext(Web3Context);
   const [candidates, setCandidates] = useState([]);
   const [lightboxOpen, setLightboxOpen] = useState(false);
