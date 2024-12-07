@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route, HashRouter } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Candidates from "./components/Candidates";
 import CUSIS from "./components/CUSIS";
@@ -223,17 +223,15 @@ function App() {
         changeEndTime,
       }}
     >
-      <Router basename="/ETHlection">
-        <div>
-          <Navbar />
-          <Routes>
-            <Route path="/candidates" element={<Candidates />} />
-            <Route path="/cusis" element={<CUSIS />} />
-            <Route path="/applyform" element={<ApplyForm />} />
-            <Route path="*" element={<Candidates />} />
-          </Routes>
-        </div>
-      </Router>
+      <HashRouter>
+        <Navbar />
+        <Routes>
+          <Route path="/candidates" element={<Candidates />} />
+          <Route path="/cusis" element={<CUSIS />} />
+          <Route path="/applyform" element={<ApplyForm />} />
+          <Route path="*" element={<Candidates />} />
+        </Routes>
+      </HashRouter>
     </Web3Context.Provider>
   );
 }

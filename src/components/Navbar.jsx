@@ -60,7 +60,7 @@ function Navbar() {
             className="navbar-brand d-flex align-items-center gap-2"
             to="/candidates"
           >
-            <img src="logo.png" alt="Logo" width="40" height="40" />
+            <img src="/ETHlection/logo.png" alt="Logo" width="40" height="40" />
             ETHlection
           </NavLink>
           <button
